@@ -1,0 +1,61 @@
+#!/bin/bash
+#PBS -l walltime=1:00:00
+#PBS -l mem=5GB
+#PBS -l ncpus=4
+#PBS -j oe
+#PBS -q express
+#PBS -l wd
+#PBS -l software=intel-compiler
+
+export JASPERLIB=/usr/lib64
+export JASPERINC=/usr/include
+
+#You need to specify UPP configuration options. Here are the choices:
+#
+#Architecture options.
+#--------------------- 
+#There are 2 architectures possible, one will 
+#optimise the code for speed but doing so it will loose precision.
+#The other keeps better precision for the calculations but runs slower.
+#
+#INTEL options (compilation for precise code):
+#1. serial
+#2. smpar (shared memory parallelisation)
+#3. dmpar (distributed memory parallelisation)
+#4. sm+dm (shared + distributed memory parallelisation)
+#
+#INTEL XEON options (compilation for fast code):
+#5. serial
+#6. smpar
+#7. dmpar
+#8. sm+dm
+#
+#Nest options:
+#-------------
+#1. basic
+#2. preset moves
+#3. vortex following
+#
+#***********************************************************************
+
+module purge
+module load pbs
+module load dot
+module load intel-fc/15.0.3.187
+module load intel-cc/15.0.3.187
+module load openmpi/1.8.8
+module load netcdf/4.3.3.1
+
+# !!!! CONFIGURE OPTIONS HERE !!!!
+#./configure 
+
+#<< EOF_configure
+#4
+#1
+#EOF_configure
+
+# For multi-processors compilation
+export J="-j $PBS_NCPUS"
+
+./compile
+
