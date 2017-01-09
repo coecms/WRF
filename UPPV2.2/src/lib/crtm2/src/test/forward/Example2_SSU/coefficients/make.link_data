@@ -1,0 +1,27 @@
+#==============================================================================
+#
+# Makefile to create *local, working copy* coefficient data links 
+# for the current example scenario
+#
+#==============================================================================
+
+# Define macros
+include $(CRTM_SOURCE_ROOT)/make.macros
+
+
+# Definitions for datafiles to link
+ENDIAN_TYPE = Big_Endian
+TAUCOEFF_TYPE = ODAS
+COEFF_FILES = Wu-Smith.CM-PDF.HQS_HQS-RefInd.EmisCoeff.bin AerosolCoeff.bin CloudCoeff.bin
+SENSOR_IDS = ssu_n06 ssu_n14
+
+
+
+# Main target
+all: create_coeff_links
+
+clean: remove_coeff_links
+
+
+# File link creation and removal
+include $(CRTM_SOURCE_ROOT)/make.test_data_link_targets
