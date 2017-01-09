@@ -1,0 +1,278 @@
+
+     **********************************************************
+                          Example5_ClearSky
+
+      Program to provide a (relatively) simple example of how 
+      to call the CRTM Forward function for clear sky 
+      conditions.
+
+      CRTM Version: REL-2.0.6
+     **********************************************************
+
+
+     Enter sensor id [hirs4_n18, amsua_metop-a, or mhs_n18]: 
+
+     Running CRTM for amsre_aqua sensor...
+
+     Initializing the CRTM...
+ Read_SpcCoeff_Binary(INFORMATION) : FILE: coefficients/amsre_aqua.SpcCoeff.bin; 
+ SpcCoeff RELEASE.VERSION:  7.01  N_CHANNELS=12
+ Read_ODAS_Binary(INFORMATION) : FILE: coefficients/amsre_aqua.TauCoeff.bin; 
+   ODAS RELEASE.VERSION:  7.06  N_PREDICTORS= 6  N_ABSORBERS= 3  N_CHANNELS=12  N_Alphas= 3  N_Coeffs=686
+ CloudCoeff_ReadFile(Binary)(INFORMATION) : FILE: coefficients/CloudCoeff.bin; 
+ CloudCoeff RELEASE.VERSION:  3.04  N_FREQUENCIES(MW)=  31  N_FREQUENCIES(IR)=  61  N_RADII(MW)=10  N_RADII(IR)=10  N_TEMPERATURES= 5  N_DENSITIES= 3  N_LEGENDRE_TERMS=38  N_PHASE_ELEMENTS= 1
+ AerosolCoeff_ReadFile(Binary)(INFORMATION) : FILE: coefficients/AerosolCoeff.bin; 
+ AerosolCoeff RELEASE.VERSION:  3.04  N_WAVELENGTHS=  61  N_RADII= 36  N_TYPES= 8  N_RH= 36  N_LEGENDRE_TERMS=37  N_PHASE_ELEMENTS= 1
+ Read_EmisCoeff_Binary(INFORMATION) : FILE: coefficients/Wu-Smith.CM-PDF.HQS_HQS-RefInd.EmisCoeff.bin; 
+ EmisCoeff RELEASE.VERSION:  2.01  N_ANGLES= 67  N_FREQUENCIES=  153  N_WIND_SPEEDS= 23
+
+
+       Profile 1 output for amsre_aqua
+
+     Channel 1 results
+ RTSolution OBJECT
+   Surface Emissivity      :  4.642155E-01
+   Up Radiance             :  1.513180E-06
+   Down Radiance           :  2.630557E-06
+   Down Solar Radiance     :  0.000000E+00
+   Surface Planck Radiance :  1.202286E-04
+   Radiance                :  5.796739E-05
+   Brightness Temperature  :  1.313736E+02
+
+     Channel 2 results
+ RTSolution OBJECT
+   Surface Emissivity      :  3.960292E-01
+   Up Radiance             :  1.513180E-06
+   Down Radiance           :  2.630557E-06
+   Down Solar Radiance     :  0.000000E+00
+   Surface Planck Radiance :  1.202286E-04
+   Radiance                :  5.005633E-05
+   Brightness Temperature  :  1.134671E+02
+
+     Channel 3 results
+ RTSolution OBJECT
+   Surface Emissivity      :  4.826589E-01
+   Up Radiance             :  4.375996E-06
+   Down Radiance           :  6.924574E-06
+   Down Solar Radiance     :  0.000000E+00
+   Surface Planck Radiance :  2.842074E-04
+   Radiance                :  1.428358E-04
+   Brightness Temperature  :  1.369784E+02
+
+     Channel 4 results
+ RTSolution OBJECT
+   Surface Emissivity      :  4.145585E-01
+   Up Radiance             :  4.375996E-06
+   Down Radiance           :  6.924574E-06
+   Down Solar Radiance     :  0.000000E+00
+   Surface Planck Radiance :  2.842074E-04
+   Radiance                :  1.242610E-04
+   Brightness Temperature  :  1.191985E+02
+
+     Channel 5 results
+ RTSolution OBJECT
+   Surface Emissivity      :  5.466468E-01
+   Up Radiance             :  3.386373E-05
+   Down Radiance           :  4.101472E-05
+   Down Solar Radiance     :  0.000000E+00
+   Surface Planck Radiance :  8.756128E-04
+   Radiance                :  5.110354E-04
+   Brightness Temperature  :  1.591095E+02
+
+     Channel 6 results
+ RTSolution OBJECT
+   Surface Emissivity      :  4.806337E-01
+   Up Radiance             :  3.386373E-05
+   Down Radiance           :  4.101472E-05
+   Down Solar Radiance     :  0.000000E+00
+   Surface Planck Radiance :  8.756128E-04
+   Radiance                :  4.581651E-04
+   Brightness Temperature  :  1.426948E+02
+
+     Channel 7 results
+ RTSolution OBJECT
+   Surface Emissivity      :  5.834063E-01
+   Up Radiance             :  1.201108E-04
+   Down Radiance           :  1.308248E-04
+   Down Solar Radiance     :  0.000000E+00
+   Surface Planck Radiance :  1.417730E-03
+   Radiance                :  9.241064E-04
+   Brightness Temperature  :  1.776894E+02
+
+     Channel 8 results
+ RTSolution OBJECT
+   Surface Emissivity      :  5.001445E-01
+   Up Radiance             :  1.201108E-04
+   Down Radiance           :  1.308248E-04
+   Down Solar Radiance     :  0.000000E+00
+   Surface Planck Radiance :  1.417730E-03
+   Radiance                :  8.263899E-04
+   Brightness Temperature  :  1.589605E+02
+
+     Channel 9 results
+ RTSolution OBJECT
+   Surface Emissivity      :  6.314301E-01
+   Up Radiance             :  2.630806E-04
+   Down Radiance           :  2.856498E-04
+   Down Solar Radiance     :  0.000000E+00
+   Surface Planck Radiance :  3.330855E-03
+   Radiance                :  2.287491E-03
+   Brightness Temperature  :  1.872779E+02
+
+     Channel 10 results
+ RTSolution OBJECT
+   Surface Emissivity      :  5.446780E-01
+   Up Radiance             :  2.630806E-04
+   Down Radiance           :  2.856498E-04
+   Down Solar Radiance     :  0.000000E+00
+   Surface Planck Radiance :  3.330855E-03
+   Radiance                :  2.045332E-03
+   Brightness Temperature  :  1.675446E+02
+
+     Channel 11 results
+ RTSolution OBJECT
+   Surface Emissivity      :  7.421951E-01
+   Up Radiance             :  3.293349E-03
+   Down Radiance           :  3.377648E-03
+   Down Solar Radiance     :  0.000000E+00
+   Surface Planck Radiance :  1.971290E-02
+   Radiance                :  1.609899E-02
+   Brightness Temperature  :  2.227693E+02
+
+     Channel 12 results
+ RTSolution OBJECT
+   Surface Emissivity      :  6.553945E-01
+   Up Radiance             :  3.293349E-03
+   Down Radiance           :  3.377648E-03
+   Down Solar Radiance     :  0.000000E+00
+   Surface Planck Radiance :  1.971290E-02
+   Radiance                :  1.492768E-02
+   Brightness Temperature  :  2.067157E+02
+
+
+       Profile 2 output for amsre_aqua
+
+     Channel 1 results
+ RTSolution OBJECT
+   Surface Emissivity      :  9.712347E-01
+   Up Radiance             :  1.657456E-06
+   Down Radiance           :  2.775651E-06
+   Down Solar Radiance     :  0.000000E+00
+   Surface Planck Radiance :  1.404188E-04
+   Radiance                :  1.363232E-04
+   Brightness Temperature  :  3.087296E+02
+
+     Channel 2 results
+ RTSolution OBJECT
+   Surface Emissivity      :  9.605646E-01
+   Up Radiance             :  1.657456E-06
+   Down Radiance           :  2.775651E-06
+   Down Solar Radiance     :  0.000000E+00
+   Surface Planck Radiance :  1.404188E-04
+   Radiance                :  1.348738E-04
+   Brightness Temperature  :  3.054490E+02
+
+     Channel 3 results
+ RTSolution OBJECT
+   Surface Emissivity      :  9.723477E-01
+   Up Radiance             :  5.679552E-06
+   Down Radiance           :  8.224690E-06
+   Down Solar Radiance     :  0.000000E+00
+   Surface Planck Radiance :  3.319506E-04
+   Radiance                :  3.225960E-04
+   Brightness Temperature  :  3.090458E+02
+
+     Channel 4 results
+ RTSolution OBJECT
+   Surface Emissivity      :  9.641652E-01
+   Up Radiance             :  5.679552E-06
+   Down Radiance           :  8.224690E-06
+   Down Solar Radiance     :  0.000000E+00
+   Surface Planck Radiance :  3.319506E-04
+   Radiance                :  3.199970E-04
+   Brightness Temperature  :  3.065580E+02
+
+     Channel 5 results
+ RTSolution OBJECT
+   Surface Emissivity      :  9.753971E-01
+   Up Radiance             :  7.353341E-05
+   Down Radiance           :  8.059606E-05
+   Down Solar Radiance     :  0.000000E+00
+   Surface Planck Radiance :  1.022809E-03
+   Radiance                :  9.953007E-04
+   Brightness Temperature  :  3.094595E+02
+
+     Channel 6 results
+ RTSolution OBJECT
+   Surface Emissivity      :  9.696757E-01
+   Up Radiance             :  7.353341E-05
+   Down Radiance           :  8.059606E-05
+   Down Solar Radiance     :  0.000000E+00
+   Surface Planck Radiance :  1.022809E-03
+   Radiance                :  9.903298E-04
+   Brightness Temperature  :  3.079162E+02
+
+     Channel 7 results
+ RTSolution OBJECT
+   Surface Emissivity      :  9.770187E-01
+   Up Radiance             :  3.259645E-04
+   Down Radiance           :  3.378362E-04
+   Down Solar Radiance     :  0.000000E+00
+   Surface Planck Radiance :  1.656167E-03
+   Radiance                :  1.603382E-03
+   Brightness Temperature  :  3.078829E+02
+
+     Channel 8 results
+ RTSolution OBJECT
+   Surface Emissivity      :  9.719520E-01
+   Up Radiance             :  3.259645E-04
+   Down Radiance           :  3.378362E-04
+   Down Solar Radiance     :  0.000000E+00
+   Surface Planck Radiance :  1.656167E-03
+   Radiance                :  1.598134E-03
+   Brightness Temperature  :  3.068771E+02
+
+     Channel 9 results
+ RTSolution OBJECT
+   Surface Emissivity      :  9.797018E-01
+   Up Radiance             :  3.984404E-04
+   Down Radiance           :  4.217606E-04
+   Down Solar Radiance     :  0.000000E+00
+   Surface Planck Radiance :  3.891672E-03
+   Radiance                :  3.790948E-03
+   Brightness Temperature  :  3.097922E+02
+
+     Channel 10 results
+ RTSolution OBJECT
+   Surface Emissivity      :  9.753349E-01
+   Up Radiance             :  3.984404E-04
+   Down Radiance           :  4.217606E-04
+   Down Solar Radiance     :  0.000000E+00
+   Surface Planck Radiance :  3.891672E-03
+   Radiance                :  3.777496E-03
+   Brightness Temperature  :  3.086960E+02
+
+     Channel 11 results
+ RTSolution OBJECT
+   Surface Emissivity      :  9.500000E-01
+   Up Radiance             :  6.306340E-03
+   Down Radiance           :  6.449655E-03
+   Down Solar Radiance     :  0.000000E+00
+   Surface Planck Radiance :  2.304734E-02
+   Radiance                :  2.190630E-02
+   Brightness Temperature  :  3.023615E+02
+
+     Channel 12 results
+ RTSolution OBJECT
+   Surface Emissivity      :  9.500000E-01
+   Up Radiance             :  6.306340E-03
+   Down Radiance           :  6.449655E-03
+   Down Solar Radiance     :  0.000000E+00
+   Surface Planck Radiance :  2.304734E-02
+   Radiance                :  2.190630E-02
+   Brightness Temperature  :  3.023615E+02
+
+     Destroying the CRTM...
+
+     Comparing calculated results with saved ones...
+ Example5_ClearSky(INFORMATION) : RTSolution results are the same!
