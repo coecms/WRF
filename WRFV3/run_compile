@@ -38,9 +38,9 @@
 module purge
 module load pbs
 module load dot
-module load intel-fc/15.0.3.187
-module load intel-cc/15.0.3.187
-module load openmpi/1.8.8
+module load intel-fc/17.0.1.132
+module load intel-cc/17.0.1.132
+module load openmpi/1.10.2
 module load openmp
 module load netcdf/4.3.3.1
 export WRFIO_NCD_LARGE_FILE_SUPPORT=1
@@ -50,7 +50,7 @@ export WRFIO_NCD_LARGE_FILE_SUPPORT=1
 
 # !!!! CONFIGURE OPTIONS HERE !!!!
 ./configure << EOF_configure
-4
+3
 1
 EOF_configure
 

@@ -6,7 +6,7 @@
 #PBS -q express
 #PBS -l wd
 
-module load openmpi/1.8.8
+module load openmpi/1.10.2
 module load netcdf/4.3.3.1
 
 limit stacksize unlimited
