@@ -7,7 +7,12 @@
 #PBS -l wd
 #PBS -l software=intel-compiler
 
-#You need to specify WRF configuration options. Here are the choices:
+# You need to specify WRF configuration options for running configure. 
+# Search for the line:
+# !!!! CONFIGURE OPTIONS HERE !!!!
+# to know where to input the options. You simply need to check the numbers
+# written after the configure line and make any change you'd like.
+# Here are the choices:
 #
 #Architecture options.
 #--------------------- 
@@ -33,7 +38,13 @@
 #2. preset moves
 #3. vortex following
 #
+# 
+# You also need to check the compilation option you want. By default,
+# this script will compile the real case. If you need to compile for
+# an idealised case, please change the value of the compile_case variable 
 #***********************************************************************
+
+compile_case=em_real
 
 module purge
 module load pbs
@@ -57,5 +68,7 @@ EOF_configure
 # For multi-processors compilation
 export J="-j $PBS_NCPUS"
 
-./compile em_real
+echo #********************************************
+echo Start compilation of ${compile_case} for WRF.
+./compile ${compile_case}
 
