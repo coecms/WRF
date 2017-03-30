@@ -560,21 +560,8 @@ CONTAINS
           ENDIF
        ENDIF
 
-    ELSE IF (model .eq. "RRTM") THEN
-       IF (tracer .eq. "CO2") THEN
-          out = 3.300e-4
-
-       ELSE IF ((tracer .eq. "N2O") .or. &
-                (tracer .eq. "CH4")) THEN
-          out = 0.
-       ELSE
-          IF ( wrf_dm_on_monitor() ) THEN
-             WRITE(message,*) 'CLWRF : Trace gas ',tracer,' not valid for scheme ',model
-             CALL wrf_error_fatal(message)
-          ENDIF
-       ENDIF
-
-    ELSE IF (model .eq. "RRTMG") THEN
+    ELSE IF ((model .eq. "RRTM") .or. &
+             (model .eq. "RRTMG")) THEN
        IF (tracer .eq. "CO2") THEN
           out = 379.e-6
 
