@@ -264,13 +264,13 @@ CC_TOOLS        =      $(SCC)
 #        respective makefile rules in the end of this file will result in longer compilation time, and, possibly
 #        Out Of Memory messages, but might produce binaries which are substantially faster.
 #
-#        Please visit http://www.intel.com/support/performancetools/sb/cs-028607.htm 
+#        Please visit http://www.intel.com/support/performancetools/sb/cs-028607.htm
 #        for latest info on how to build WRF with Intel compilers.
 #
 #        If you got Out Of Memory message, there are several options:
 #          1. Check your memory limits (ulimit -a), possibly increasing swap partitions size.
 #          2. Remove any debugging flags (-g, -check, -traceback).
-#          3. Force the problematic file to be compiled with less optimizations (see examples at the 
+#          3. Force the problematic file to be compiled with less optimizations (see examples at the
 #             end of this file), try -no-ip compiler flag.
 #
 #        This configuration is aimed at accuracy. To improve performance (at the expence of accuracy) you might
@@ -289,8 +289,8 @@ CC_TOOLS        =      $(SCC)
 #
 #        Suggestions for timing improvements from Craig Mattocks
 #
-#CFLAGS_LOCAL    =       -w -O3 -ip -fp-model precise -w -ftz -align all -fno-alias $(FORMAT_FREE) $(BYTESWAPIO) #-xHost -fp-model fast=2 -no-prec-div -no-prec-sqrt -ftz -no-multibyte-chars 
-#LDFLAGS_LOCAL   =       -ip -fp-model precise -w -ftz -align all -fno-alias $(FORMAT_FREE) $(BYTESWAPIO) #-xHost -fp-model fast=2 -no-prec-div -no-prec-sqrt -ftz -align all -fno-alias -fno-common 
+#CFLAGS_LOCAL    =       -w -O3 -ip -fp-model precise -w -ftz -align all -fno-alias $(FORMAT_FREE) $(BYTESWAPIO) #-xHost -fp-model fast=2 -no-prec-div -no-prec-sqrt -ftz -no-multibyte-chars
+#LDFLAGS_LOCAL   =       -ip -fp-model precise -w -ftz -align all -fno-alias $(FORMAT_FREE) $(BYTESWAPIO) #-xHost -fp-model fast=2 -no-prec-div -no-prec-sqrt -ftz -align all -fno-alias -fno-common
 #FCBASEOPTS_NO_G =       -w -ip -fp-model precise -w -ftz -align all -fno-alias $(FORMAT_FREE) $(BYTESWAPIO) #-xHost -fp-model fast=2 -no-heap-arrays -no-prec-div -no-prec-sqrt -ftz -align all -fno-alias -fno-common $(FORMAT_FREE) $(BYTESWAPIO)
 
 DESCRIPTION     =       INTEL ($SFC/$SCC)
@@ -311,11 +311,11 @@ PROMOTION       =       -real-size `expr 8 \* $(RWORDSIZE)` -i4
 ARCH_LOCAL      =       -DNONSTANDARD_SYSTEM_FUNC  -DWRF_USE_CLM
 CFLAGS_LOCAL    =       -w -O3 -ip #-xHost -fp-model fast=2 -no-prec-div -no-prec-sqrt -ftz -no-multibyte-chars
 LDFLAGS_LOCAL   =       -ip #-xHost -fp-model fast=2 -no-prec-div -no-prec-sqrt -ftz -align all -fno-alias -fno-common
-CPLUSPLUSLIB    =       
+CPLUSPLUSLIB    =      
 ESMF_LDFLAG     =       $(CPLUSPLUSLIB)
 FCOPTIM         =       -O3
-FCREDUCEDOPT	=       $(FCOPTIM)
-FCNOOPT		=       -O0 -fno-inline -no-ip
+FCREDUCEDOPT    =       $(FCOPTIM)
+FCNOOPT         =       -O0 -fno-inline -no-ip
 FCDEBUG         =       # -g $(FCNOOPT) -traceback # -fpe0 -check noarg_temp_created,bounds,format,output_conversion,pointers,uninit -ftrapuv -unroll0 -u
 FORMAT_FIXED    =       -FI
 FORMAT_FREE     =       -FR
@@ -378,7 +378,7 @@ AR              =      ar
 ARFLAGS         =      ru
 M4              =      m4
 RANLIB          =      ranlib
-RLFLAGS		=	
+RLFLAGS         =      
 CC_TOOLS        =      gcc
 
 ###########################################################
@@ -390,9 +390,9 @@ DMPARALLEL      =       # 1
 OMPCPP          =       # -D_OPENMP
 OMP             =       # -openmp -fpp -auto
 OMPCC           =       # -openmp -fpp -auto
-SFC             =       ifort 
-SCC             =       icc 
-CCOMP           =       icc 
+SFC             =       ifort
+SCC             =       icc
+CCOMP           =       icc
 DM_FC           =       mpif90 -f90=$(SFC)
 DM_CC           =       mpicc -cc=$(SCC)
 FC              =       $(DM_FC)
@@ -405,11 +405,11 @@ OPTNOSIMD       =
 OPTAVX          =       -xAVX
 CFLAGS_LOCAL    =       -w -O3 $(OPTAVX)
 LDFLAGS_LOCAL   =       $(OPTAVX)
-CPLUSPLUSLIB    =       
+CPLUSPLUSLIB    =      
 ESMF_LDFLAG     =       $(CPLUSPLUSLIB)
 FCOPTIM         =       -O3 $(OPTAVX)
-FCREDUCEDOPT	=       $(FCOPTIM)
-FCNOOPT		=       -O0 -fno-inline -no-ip
+FCREDUCEDOPT    =       $(FCOPTIM)
+FCNOOPT         =       -O0 -fno-inline -no-ip
 FCDEBUG         =       # -g $(FCNOOPT) -traceback # -fpe0 -check noarg_temp_created,bounds,format,output_conversion,pointers,uninit -ftrapuv -unroll0 -u
 FORMAT_FIXED    =       -FI
 FORMAT_FREE     =       -FR
@@ -425,7 +425,7 @@ AR              =      ar
 ARFLAGS         =      ru
 M4              =      m4
 RANLIB          =      ranlib
-RLFLAGS		=	
+RLFLAGS         =      
 CC_TOOLS        =      gcc
 
 ###########################################################
