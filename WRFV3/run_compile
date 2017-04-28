@@ -43,16 +43,15 @@ module load intel-cc/15.0.3.187
 module load openmpi/1.8.8
 module load openmp
 module load netcdf/4.3.3.1
-export WRFIO_NCD_LARGE_FILE_SUPPORT=1
 
 # Un-comment to compile with chemistry
 #export WRF_CHEM=1
 
-# !!!! CONFIGURE OPTIONS HERE !!!!
-./configure << EOF_configure
-4
-1
-EOF_configure
+## !!!! CONFIGURE OPTIONS HERE !!!!
+#./configure << EOF_configure
+#4
+#1
+#EOF_configure
 
 # For multi-processors compilation
 export J="-j $PBS_NCPUS"
