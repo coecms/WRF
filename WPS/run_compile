@@ -1,0 +1,34 @@
+#!/bin/bash
+#PBS -l walltime=1800
+#PBS -l mem=600MB
+#PBS -l ncpus=1
+#PBS -q express
+#PBS -l wd
+#PBS -j oe
+#PBS -l software=intel-compiler
+
+# You need to choose the configure option you wish to use and modify it in this file
+# Available options:
+# 1. serial code
+# 2. serial code without GRIB2
+# 3. distributed memory code
+# 4. distributed memory code without GRIB2
+
+module purge
+module load pbs
+module load dot
+module load intel-fc/15.0.3.187
+module load intel-cc/15.0.3.187
+module load openmpi/1.8.8
+module load netcdf/4.3.3.1
+module load ncl/6.3.0
+
+# Option to change HERE!
+./configure << EOF_configure
+20
+EOF_configure
+
+./compile
+./compile plotfmt
+./compile plotgrids
+
