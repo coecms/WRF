@@ -46,13 +46,10 @@
 
 compile_case=em_real
 
-module purge
-module load pbs
-module load dot
-module load intel-fc/15.0.3.187
-module load intel-cc/15.0.3.187
-module load openmpi/1.8.8
-module load netcdf/4.3.3.1
+source ../build.env
+
+# WRF now supports large files per default. Option to turn off the support.
+#export WRFIO_NCD__NO_LARGE_FILE_SUPPORT=1
 
 # Un-comment to compile with chemistry
 #export WRF_CHEM=1
