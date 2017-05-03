@@ -12,25 +12,29 @@
 # !!!! CONFIGURE OPTIONS HERE !!!!
 # to know where to input the options. You simply need to check the numbers
 # written after the configure line and make any change you'd like.
+#
+# Default is 7: optimised for Sandy Bridge (normal/express queues), distributed memory only.
+#
 # Here are the choices:
 #
 #Architecture options.
 #--------------------- 
-#There are 2 architectures possible, one will 
-#optimise the code for speed but doing so it will loose precision.
-#The other keeps better precision for the calculations but runs slower.
+#There are 4 architectures possible. On each architecture, you can compile the code in 
+# 4 different ways (in that order):
+# - a. serial
+# - b. smpar (shared memory parallelisation)
+# - c. dmpar (distributed memory parallelisation)
+# - d. sm+dm (shared + distributed memory parallelisation)
 #
-#INTEL options (compilation for precise code):
-#1. serial
-#2. smpar (shared memory parallelisation)
-#3. dmpar (distributed memory parallelisation)
-#4. sm+dm (shared + distributed memory parallelisation)
+# The architectures are:
+# - 1. best precision (options 1-4)
+# - 2. optimisation for Sandy Bridge processors (express/normal queues) (options 5-8)
+# - 3. optimisation for Broadwell processors (expressbw/normalbw queues) (options 9-12)
+# - 4. optimisation for Knights Landing processors (knl queue) (options 13-16)
 #
-#INTEL XEON options (compilation for fast code):
-#5. serial
-#6. smpar
-#7. dmpar
-#8. sm+dm
+#
+# E.g: To compile an optimised code for Broadwell processors, compiled with OpenMPI and OpenMP, 
+# you need to choose the option 12.
 #
 #Nest options:
 #-------------
@@ -39,7 +43,7 @@
 #3. vortex following
 #
 # 
-# You also need to check the compilation option you want. By default,
+# You also need to check which case you want. By default,
 # this script will compile the real case. If you need to compile for
 # an idealised case, please change the value of the compile_case variable 
 #***********************************************************************
@@ -56,7 +60,7 @@ source ../build.env
 
 # !!!! CONFIGURE OPTIONS HERE !!!!
 ./configure << EOF_configure
-15
+7
 1
 EOF_configure
 
