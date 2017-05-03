@@ -16,18 +16,9 @@
 
 source ../build.env
 
-#module purge
-#module load pbs
-#module load dot
-#module load intel-fc/15.0.3.187
-#module load intel-cc/15.0.3.187
-#module load openmpi/1.8.8
-#module load netcdf/4.3.3.1
-#module load ncl/6.3.0
-
 # Option to change HERE!
 ./configure << EOF_configure
-20
+4
 EOF_configure
 
 ./compile
