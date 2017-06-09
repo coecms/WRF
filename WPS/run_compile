@@ -1,12 +1,4 @@
 #!/bin/bash
-#PBS -l walltime=1800
-#PBS -l mem=600MB
-#PBS -l ncpus=1
-#PBS -q express
-#PBS -l wd
-#PBS -j oe
-#PBS -l software=intel-compiler
-
 # You need to choose the configure option you wish to use and modify it in this file
 # Available options:
 # 1. serial code
@@ -14,14 +6,94 @@
 # 3. distributed memory code
 # 4. distributed memory code without GRIB2
 
+# Default values for command line options
+architecture=3
+clean=0
+help_text=0
+
+# Read in command line arguments (code is a mix from https://stackoverflow.com/questions/192249/how-do-i-parse-command-line-arguments-in-bash and man getopt example) 
+SHORT=ha:c
+LONG=architecture:,help,clean
+
+PARSED=$(getopt --options $SHORT --longoptions $LONG --name "$0" -- "$@")
+if [[ $? != 0 ]] ; then echo "Wrong arguments. Terminating..." >&2 ; exit 1 ; fi
+
+
+eval set -- "$PARSED"
+
+while true; do
+    case "$1" in
+	-a|--architecture) architecture="$2"; shift 2 ;;
+        -c|--clean) clean=1; shift ;;
+	-h|--help) help_text=1; shift ;;
+	--) shift; break ;;
+	*) echo "Programming error"; exit 1 ;;
+    esac
+done
+
+if [[ ${help_text} == 1 ]]; then
+    echo "The optional arguments are:"
+
+    # Architecture
+    echo "-a, --architecture  followed by a number (default 3). "
+    echo "    This is the input required by configure to choose the compilation options."
+    echo "    There are 4 different possibilities: "
+    echo "        1. serial code "
+    echo "        2. serial code without GRIB2"
+    echo "        3. distributed memory code"
+    echo "        4. distributed memory code without GRIB2"
+    
+    # Clean option
+    echo "-c, --clean   will call './clean -a' before configure and compilation"
+
+    # Help
+    echo "-h, --help  writes this help text"
+    exit 0
+fi
+
+# Some debugging outputs
+if [[ 0 == 1 ]]; then
+    echo "All the arguments values are: "
+    echo "architecture: "$architecture
+    echo "clean: "$clean
+    echo "help_text: "${help_text}
+    exit 1
+fi
+
+# Clean if asked for
+if [[ $clean == 1 ]]; then
+    ./clean -a
+fi
+
+# Source the modules
 source ../build.env
+
+# Load the JASPER environment variables if GRIB2 requested
+if [[ ${architecture} == 1 || ${architecture} == 3 ]]; then
+    export JASPERINC=/usr/include
+    export JASPERLIB=/usr/lib64
+fi
 
 # Option to change HERE!
 ./configure << EOF_configure
-4
+${architecture}
 EOF_configure
+
+qsub -N compile_wps <<EOF_compile
+#PBS -l walltime=1800
+#PBS -l mem=600MB
+#PBS -l ncpus=1
+#PBS -q express
+#PBS -l wd
+#PBS -j oe
+#PBS -l software=intel-compiler
+#PBS -W umask=0022
+
+source ../build.env
 
 ./compile
 ./compile plotfmt
 ./compile plotgrids
+
+EOF_compile
 
