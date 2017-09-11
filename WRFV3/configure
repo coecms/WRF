@@ -295,12 +295,12 @@ USENETCDFF=""  # see below
 if [ -n "$NETCDF" ] ; then
   echo "Will use NETCDF in dir: $NETCDF"
 # Oh UNIDATA, why make it so hard ...
-  if [ -f "$NETCDF/lib/Intel/libnetcdff.a" -o -f "$NETCDF/lib/Intel/libnetcdff.so" ] ; then
+  if [ -f "$NETCDF/lib/libnetcdff.a" -o -f "$NETCDF/lib/libnetcdff.so" ] ; then
     USENETCDFF="-lnetcdff"
   else
     USENETCDFF=" "
   fi
-  if [ -f "$NETCDF/lib/Intel/libnetcdf.a" -o -f "$NETCDF/lib/Intel/libnetcdf.so" ] ; then
+  if [ -f "$NETCDF/lib/libnetcdf.a" -o -f "$NETCDF/lib/libnetcdf.so" ] ; then
     USENETCDF="-lnetcdf"
   else
     USENETCDF=" "
