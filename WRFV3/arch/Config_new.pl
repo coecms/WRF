@@ -247,7 +247,7 @@ while ( substr( $ARGV[0], 0, 1 ) eq "-" )
 # environment variables JASPERLIB and JASPERINC to paths to library and 
 # include files to enable this feature prior to running configure.  
 
- $I_really_want_to_output_grib2_from_WRF = "FALSE" ;
+ $I_really_want_to_output_grib2_from_WRF = "TRUE" ;
 
  if ( $ENV{JASPERLIB} && $ENV{JASPERINC} && $I_really_want_to_output_grib2_from_WRF eq "TRUE" )
    {
@@ -842,7 +842,7 @@ print "$ENV{WRF_MARS}" ;
 
 close CONFIGURE_WRF ;
 
-printf "Configuration successful! \n" ;
+printf "Configuration successful! To build the model, please run: qsub run_compile. \n" ;
 printf "------------------------------------------------------------------------\n" ;
 
 
