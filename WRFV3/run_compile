@@ -137,7 +137,7 @@ if [[ $clean == 1 ]]; then
 fi
 
 # WRF now supports large files per default. Option to turn off the support.
-#export WRFIO_NCD__NO_LARGE_FILE_SUPPORT=1
+#export WRFIO_NCD_NO_LARGE_FILE_SUPPORT=1
 
 # Un-comment to compile with chemistry
 if [[ $chem == 1 ]]; then
