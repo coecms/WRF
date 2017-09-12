@@ -10,10 +10,11 @@
 architecture=3
 clean=0
 help_text=0
+test=""
 
 # Read in command line arguments (code is a mix from https://stackoverflow.com/questions/192249/how-do-i-parse-command-line-arguments-in-bash and man getopt example) 
-SHORT=ha:c
-LONG=architecture:,help,clean
+SHORT=ha:ct
+LONG=architecture:,help,clean,test
 
 PARSED=$(getopt --options $SHORT --longoptions $LONG --name "$0" -- "$@")
 if [[ $? != 0 ]] ; then echo "Wrong arguments. Terminating..." >&2 ; exit 1 ; fi
@@ -25,6 +26,7 @@ while true; do
     case "$1" in
 	-a|--architecture) architecture="$2"; shift 2 ;;
         -c|--clean) clean=1; shift ;;
+	-t|--test) test="-W block=true"; shift ;;
 	-h|--help) help_text=1; shift ;;
 	--) shift; break ;;
 	*) echo "Programming error"; exit 1 ;;
@@ -44,7 +46,10 @@ if [[ ${help_text} == 1 ]]; then
     echo "        4. distributed memory code without GRIB2"
     
     # Clean option
-    echo "-c, --clean   will call './clean -a' before configure and compilation"
+    echo "-c, --clean  will call './clean -a' before configure and compilation"
+
+    # Test option
+    echo "-t, --test  for use with Jenkins tests only"
 
     # Help
     echo "-h, --help  writes this help text"
@@ -79,7 +84,7 @@ fi
 ${architecture}
 EOF_configure
 
-qsub -N compile_wps <<EOF_compile
+qsub $test -N compile_wps <<EOF_compile
 #PBS -l walltime=1800
 #PBS -l mem=600MB
 #PBS -l ncpus=1
