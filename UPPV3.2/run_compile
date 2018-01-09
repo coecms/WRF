@@ -1,0 +1,27 @@
+#!/bin/bash
+
+export JASPERLIB=/usr/lib64
+export JASPERINC=/usr/include
+
+# Source modules for common environment file
+source ../build.env
+
+./configure
+
+echo Submitting compilation to queue.
+qsub -N UPPcompile <<EOF
+#PBS -l walltime=0:40:00
+#PBS -l mem=1.5GB
+#PBS -l ncpus=1
+#PBS -j oe
+#PBS -q express
+#PBS -l wd
+#PBS -l software=intel-compiler
+
+# Source modules from common environment file
+source ../build.env
+
+./compile
+
+EOF
+
