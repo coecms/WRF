@@ -1,0 +1,17 @@
+This is a subset of the coefficient normally distributed by JCSDA with this
+package.  Below is an outline of the changes that were made to bring this
+package into the UPP communtiy code.
+
+In EmisCoeff:
+  The file EmisCoeff.bin is the Nalli.EK-PDF.W_W-RefInd.EmisCoeff.bin
+  file under both Big&Little Endian.
+
+In SpcCoeff:
+  Only 7 of the 301 files distributed by JCSDA are made available with
+  UPP.
+
+In TauCoeff:
+  These files are the ODPS files distributed by JCSDA, no ODAS files are
+  distributed with the UPP package.  Only 7 of the 263 JCSDA files are made 
+  available with UPP.
+
