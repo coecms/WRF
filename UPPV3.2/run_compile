@@ -1,17 +1,100 @@
 #!/bin/bash
 
+#---------------------------------------
+# For help using this script please run:
+# ./run_compile -h
+#---------------------------------------
+
+#
+# Default values for variables populated by command-line argument
+debug=""
+help_text=0
+architecture=4
+clean=0
+test=""
+
+# Read in command line arguments (code is a mix from https://stackoverflow.com/questions/192249/how-do-i-parse-command-line-arguments-in-bash and man getopt example) 
+SHORT=dhta:c
+LONG=architecture:,help,clean,test
+
+PARSED=$(getopt --options $SHORT --longoptions $LONG --name "$0" -- "$@")
+if [[ $? != 0 ]] ; then echo "Wrong arguments. Terminating..." >&2 ; exit 1 ; fi
+
+
+eval set -- "$PARSED"
+
+while true; do
+    case "$1" in
+	-d) debug=-d; shift ;;
+        -t|--test) test="-W block=true"; shift ;;
+	-a|--architecture) architecture="$2"; shift 2 ;;
+        -c|--clean) clean=1; shift ;;
+	-h|--help) help_text=1; shift ;;
+	--) shift; break ;;
+	*) echo "Programming error"; exit 1 ;;
+    esac
+done
+
+if [[ ${help_text} == 1 ]]; then
+    echo "The optional arguments are:"
+
+    # Architecture
+    echo "-a, --architecture  followed by a number (default 4). "
+    echo "    This is the first input required by configure to choose the compilation options."
+    echo "    There are 2 different possibilities, serial or parallel: "
+    echo "        serial  no parallelisation, runs on 1 processor"
+    echo "        dmpar   distributed memory parallelisation"
+    
+    echo "    The architecture choices are:"
+    echo "        3    serial"
+    echo "        4    parallel"
+
+    # Debugging options
+    echo "-d   build with debugging information, no optimization, traceback and check all" 
+    echo
+
+    # Clean option
+    echo "-c, --clean   will call './clean -a' before configure and compilation"
+    echo
+
+    # Help
+    echo "-h, --help  writes this help text"
+    echo
+
+    # Test
+    echo "-t, --test  option for Jenkins tests only"
+    exit 0
+fi
+
+# Some debugging outputs
+if [[ 0 == 1 ]]; then
+    echo "All the arguments values are: "
+    echo "debug: "$debug
+    echo "architecture: "$architecture
+    echo "clean: "$clean
+    echo "help_text: "${help_text}
+    exit 1
+fi
+
 export JASPERLIB=/usr/lib64
 export JASPERINC=/usr/include
 
 # Source modules for common environment file
 source ../build.env
 
-./configure
+# Clean if asked for
+if [[ $clean == 1 ]]; then
+    ./clean -a
+fi
+
+./configure $debug <<EOF_configure
+$architecture
+EOF_configure
 
 echo Submitting compilation to queue.
-qsub -N UPPcompile <<EOF
+qsub $test -N UPPcompile <<EOF
 #PBS -l walltime=0:40:00
-#PBS -l mem=1.5GB
+#PBS -l mem=1500MB
 #PBS -l ncpus=1
 #PBS -j oe
 #PBS -q express
