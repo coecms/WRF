@@ -1,0 +1,13 @@
+#!/bin/tcsh
+#PBS -l walltime=300
+#PBS -l mem=1GB
+#PBS -l ncpus=4
+#PBS -j oe
+#PBS -q express
+#PBS -l wd
+
+source ../../build.env
+limit stacksize unlimited
+
+echo running with $PBS_NCPUS mpi ranks
+time mpirun -np $PBS_NCPUS -report-bindings ./real.exe
