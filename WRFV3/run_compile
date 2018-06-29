@@ -158,6 +158,7 @@ $nest
 EOF_configure
 
 # submit compile to the queue.
+echo Submitting the compilation to the express queue. Allow for about 40min to finish. Use the nqstat command to check status.
 qsub $test -N compile_job <<EOF_compile
 #!/bin/bash
 #PBS -l walltime=1:00:00
