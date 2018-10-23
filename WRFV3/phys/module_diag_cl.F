@@ -223,7 +223,9 @@ CONTAINS
                t2clmin=t2clmin+t273
                t2clmax=t2clmax+t273
                q2clmean=q2clmean/nsteps
-               q2clstd=SQRT(MAX(q2clstd/nsteps-q2clmean*q2clmean, 0.))
+               q2clstd=q2clstd/nsteps-q2clmean*q2clmean
+               q2clstd=MAX(q2clstd,0.)
+               q2clstd=SQRT(q2clstd)
                u10clmean=u10clmean/nsteps
                v10clmean=v10clmean/nsteps
                spduv10clmean=spduv10clmean/nsteps
@@ -236,7 +238,9 @@ CONTAINS
                raincclstd=SQRT(MAX(raincclstd/nsteps-raincclmean**2., 0.))
                rainncclstd=SQRT(MAX(rainncclstd/nsteps-rainncclmean**2., 0.))
                skintempclmean=skintempclmean/nsteps
-               skintempclstd=SQRT(MAX(skintempclstd/nsteps-skintempclmean*skintempclmean, 0.))
+               skintempclstd=skintempclstd/nsteps-skintempclmean*skintempclmean
+               skintempclstd=MAX(skintempclstd,0.)
+               skintempclstd=SQRT(skintempclstd)
                skintempclmean=skintempclmean+t273
                skintempclmin=skintempclmin+t273
                skintempclmax=skintempclmax+t273

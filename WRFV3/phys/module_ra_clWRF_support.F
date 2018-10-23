@@ -182,30 +182,16 @@ CONTAINS
              ENDDO
           ENDIF
        ELSE
-          PRINT *,"CLWRF -- clwrf -- CLWRF ALERT!"
-          PRINT *,"   'CAMtr_volume_mixing_ratio' does not exists"
-          PRINT *,'   Recovering original concentrations'
-          
-          !ccc Fake yrdata. Won't be use but a value > yr is needed so that
-          ! everything work.
-          ! With negative mixing ratios in co2r, n2or and ch4r, no interpolation
-          ! is done and we use the constant mixing ratios that were used before
-          ! CLWRF modifications.
           max_years = VARCAM_in_years ! Set max number of years to the table size
                                       ! used for CAM.
-          yrdata = yr + 1
-          juldata = 1
-          co2r   = -9999.999
-          n2or   = -9999.999
-          ch4r   = -9999.999
-          cfc11r = -9999.999
-          cfc12r = -9999.999
-
           ! For CAM model, recovers original data sets.
           IF (model .eq. "CAM") THEN
              yrdata(1:max_years) = yr_CAM
              co2r(1:max_years)   = co2r_CAM
+          ELSE
+             CALL wrf_error_fatal("CLWRF: 'CAMtr_volume_mixing_ratio' does not exist")
           ENDIF
+
        ENDIF ! CAMtr_volume_mixing_ratio exists
        
     ENDIF ! File already opened and read 
