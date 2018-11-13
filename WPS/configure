@@ -317,9 +317,9 @@ cat > fort_netcdf.f <<EOF
         end program
 EOF
     FFLAGS=`grep ^FFLAGS configure.wps | cut -d"=" -f2-`
-    cp $NETCDF/include/netcdf.inc .
+    cp $NETCDF/include/Intel/netcdf.inc .
     FC=`grep ^SFC configure.wps | cut -d"=" -f2-`
-    $FC ${FFLAGS} fort_netcdf.f -o fort_netcdf -L${NETCDF}/lib $NETCDFF -lnetcdf > /dev/null 2>&1 
+    $FC ${FFLAGS} fort_netcdf.f -o fort_netcdf -L${NETCDF}/lib/Intel $NETCDFF -lnetcdf > /dev/null 2>&1 
     if [ -f "fort_netcdf" ] ; then
       ./fort_netcdf > /dev/null 2>&1
       if [ $? = 0 ]; then
