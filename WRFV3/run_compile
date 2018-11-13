@@ -12,10 +12,9 @@ opt=""
 chem=""
 help_text=0
 compile_case=em_real
-architecture=7
+architecture=15
 nest=1
 clean=0
-netcdf4=0
 test=""
 
 # Read in command line arguments (code is a mix from https://stackoverflow.com/questions/192249/how-do-i-parse-command-line-arguments-in-bash and man getopt example) 
@@ -39,8 +38,7 @@ while true; do
 	--compile_case) compile_case="$2"; shift 2 ;;
 	-a|--architecture) architecture="$2"; shift 2 ;;
 	-n|--nest) nest="$2"; shift 2 ;;
-        --netcdf4) netcdf4=1; shift ;;
-        -c|--clean) clean=1; shift ;;
+    -c|--clean) clean=1; shift ;;
 	-h|--help) help_text=1; shift ;;
 	--) shift; break ;;
 	*) echo "Programming error"; exit 1 ;;
@@ -51,7 +49,7 @@ if [[ ${help_text} == 1 ]]; then
     echo "The optional arguments are:"
 
     # Architecture
-    echo "-a, --architecture  followed by a number (default 7). "
+    echo "-a, --architecture  followed by a number (default 15). "
     echo "    This is the first input required by configure to choose the compilation options."
     echo "    There are 16 different possibilities. "
     echo "    There are 4 processor options and each have 4 parallelisation options."
@@ -62,12 +60,12 @@ if [[ ${help_text} == 1 ]]; then
     echo "        sm+dm   shared and distributed memory parallelisation"
     
     echo "    The architecture choices are:"
-    echo "        1-4    best precision (1=serial, 2=smpar, 3=dmpar, 4=sm+dm)"
-    echo "        5-8    optimisation for Sandy Bridge processors (express/normal queues)"
+    echo "        13-16    best precision (1=serial, 2=smpar, 3=dmpar, 4=sm+dm)"
+    echo "        18-21    optimisation for Sandy Bridge processors (express/normal queues)"
     echo "               (5=serial, 6=smpar, 7=dmpar, 8=sm+dm)"
-    echo "        9-12   optimisation for Broadwell processors (expressbw/normalbw queues)"
+    echo "        64-67   optimisation for Broadwell processors (expressbw/normalbw queues)"
     echo "               (9=serial, 10=smpar, 11=dmpar, 12=sm+dm)"
-    echo "        13-16  optimisation for Knights Landing processors (knl queue)"
+    echo "        68-71  optimisation for Knights Landing processors (knl queue)"
     echo "               (13=serial, 14=smpar, 15=dmpar, 16=sm+dm)"
     echo 
 
@@ -78,10 +76,6 @@ if [[ ${help_text} == 1 ]]; then
     echo "        2   preset moves"
     echo "        3   vortex following"
     echo 
-
-    # To write compressed netCDF4 outputs
-    echo "-netcdf4   to output netCDF4, compressed files."
-    echo
 
     # Debugging options
     echo "-d   build with debugging information and no optimization" 
@@ -123,7 +117,6 @@ if [[ 0 == 1 ]]; then
     echo "compile_case: "$compile_case
     echo "architecture: "$architecture
     echo "nest: "$nest
-    echo "netcdf4: "$netcdf4
     echo "clean: "$clean
     echo "help_text: "${help_text}
     exit 1

@@ -63,6 +63,7 @@ if `pwd | grep ' ' > /dev/null ` ; then
   echo '*****************************************************************************'
 fi
 
+Intel=Intel
 
 # lifted from the configure file for mpich; 00/03/10 jm
 #
@@ -180,7 +181,7 @@ USENETCDF=""
 if [ -n "$NETCDF" ] ; then
   echo "Will use NETCDF in dir: $NETCDF"
 # Oh UNIDATA, why make it so hard ...
-  if [ -f "$NETCDF/lib/libnetcdff.a" -o -f "$NETCDF/lib/libnetcdff.so" ] ; then
+  if [ -f "$NETCDF/lib/$Intel/libnetcdff.a" -o -f "$NETCDF/lib/$Intel/libnetcdff.so" ] ; then
     USENETCDFF="-lnetcdff"
   else
     USENETCDFF=" "
@@ -205,7 +206,8 @@ fi
 # If the user asked for classic netcdf, acquiesce to the request.
 
 if [ "`uname`" = "Linux" ] ; then
-  ans="`whereis nf-config`"
+#  ans="`whereis nf-config`"
+  ans="`which nf-config`"
 elif [ "`uname`" = "Darwin" ] ; then
   ans="`which nf-config`"
 else
@@ -234,6 +236,7 @@ else
     fi
   fi
 fi
+echo "NETCDF_classic: " "$NETCDF_classic"
 
 if [ -z "$HDF5_PATH" ] ; then HDF5_PATH=''; fi
 if [ -z "$ZLIB_PATH" ] ; then ZLIB_PATH=''; fi
@@ -630,13 +633,13 @@ echo "If you wish to change the default options, edit the file:"
 echo "     arch/configure.defaults"
 
 if test -n "$NETCDF" ; then
-  if [ ! -f $NETCDF/include/netcdf.inc ] ; then
+  if [ ! -f $NETCDF/include/$Intel/netcdf.inc ] ; then
     echo
     echo "Error : Not found $NETCDF/include/netcdf.inc"
     echo "        Please check this installation of NetCDF and re-run this configure script"
     exit -1
   fi
-  grep nf_format_64bit $NETCDF/include/netcdf.inc > /dev/null
+  grep nf_format_64bit $NETCDF/include/$Intel/netcdf.inc > /dev/null
   configure_aaaa=$? ; export configure_aaaa
   if [ $configure_aaaa -a -z "$WRFIO_NCD_NO_LARGE_FILE_SUPPORT" ] ; then
     echo "NetCDF users note:"
@@ -713,7 +716,7 @@ EOF
     fi
   fi
 
-  if [ -e $NETCDF/lib/libnetcdf.a -a "$SFC" != "" -a "$SCC" != "" -a "$CCOMP" != "" ]; then
+  if [ -e $NETCDF/lib/$Intel/libnetcdf.a -a "$SFC" != "" -a "$SCC" != "" -a "$CCOMP" != "" ]; then
 
     SFC_MULTI_ABI=0
     SCC_MULTI_ABI=0
@@ -724,7 +727,7 @@ EOF
     echo Testing for NetCDF, C and Fortran compiler
     echo
 
-    ar p $NETCDF/lib/libnetcdf.a `ar t $NETCDF/lib/libnetcdf.a | grep -E '\.o' | head -n 1 | sed 's/://'` > ${foo}.o
+    ar p $NETCDF/lib/$Intel/libnetcdf.a `ar t $NETCDF/lib/$Intel/libnetcdf.a | grep -E '\.o' | head -n 1 | sed 's/://'` > ${foo}.o
     netcdf_arch="`file ${foo}.o | grep -o -E '[0-9]{2}-bit|i386'`"
     rm ${foo}.o
 
