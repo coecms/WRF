@@ -7,7 +7,7 @@
 # 4. distributed memory code without GRIB2
 
 # Default values for command line options
-architecture=3
+architecture=19
 clean=0
 help_text=0
 test=""
@@ -40,10 +40,10 @@ if [[ ${help_text} == 1 ]]; then
     echo "-a, --architecture  followed by a number (default 3). "
     echo "    This is the input required by configure to choose the compilation options."
     echo "    There are 4 different possibilities: "
-    echo "        1. serial code "
-    echo "        2. serial code without GRIB2"
-    echo "        3. distributed memory code"
-    echo "        4. distributed memory code without GRIB2"
+    echo "        17. serial code "
+    echo "        18. serial code without GRIB2"
+    echo "        19. distributed memory code"
+    echo "        20. distributed memory code without GRIB2"
     
     # Clean option
     echo "-c, --clean  will call './clean -a' before configure and compilation"

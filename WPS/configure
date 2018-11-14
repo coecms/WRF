@@ -120,7 +120,7 @@ if [ -n "$NETCDF" ] ; then
   # for 3.6.2 and greater there might be a second library, libnetcdff.a .  Check for this and use
   # if available
   NETCDFF=" "
-  if [ -f "$NETCDF/lib/libnetcdff.a" ] ; then
+  if [ -f "$NETCDF/lib/libnetcdff.a" -o -f "$NETCDF/lib/Intel/libnetcdff.a" ] ; then
     NETCDFF="-lnetcdff"
   fi
 else
@@ -165,7 +165,7 @@ if [ $os = "Linux" -o $os = "Darwin" ]; then
   SFC="`type $SFC 2>/dev/null | awk '{print $NF}' | sed -e 's/(//g;s/)//g'`"
   SCC="`type $SCC 2>/dev/null | awk '{print $NF}' | sed -e 's/(//g;s/)//g'`"
 
-  if [ -e $NETCDF/lib/libnetcdf.a -a "$SFC" != "" -a "$SCC" != "" ]; then
+  if [ -e $NETCDF/lib/Intel/libnetcdf.a -a "$SFC" != "" -a "$SCC" != "" ]; then
 
     SFC_MULTI_ABI=0
     SCC_MULTI_ABI=0
@@ -191,7 +191,7 @@ cat > ${foo}.f <<EOF
           end program test_exit
 EOF
 
-    nct=`nm $NETCDF/lib/libnetcdf.a | grep '^0' | cut -d' ' -f 1 | head -1 | wc -c | awk '{print $1+0}'`
+    nct=`nm $NETCDF/lib/Intel/libnetcdf.a | grep '^0' | cut -d' ' -f 1 | head -1 | wc -c | awk '{print $1+0}'`
     if [ "$nct" -eq "9" ]; then
       netcdf_arch="32-bit"
     else
@@ -317,9 +317,9 @@ cat > fort_netcdf.f <<EOF
         end program
 EOF
     FFLAGS=`grep ^FFLAGS configure.wps | cut -d"=" -f2-`
-    cp $NETCDF/include/netcdf.inc .
+    cp $NETCDF/include/Intel/netcdf.inc .
     FC=`grep ^SFC configure.wps | cut -d"=" -f2-`
-    $FC ${FFLAGS} fort_netcdf.f -o fort_netcdf -L${NETCDF}/lib $NETCDFF -lnetcdf > /dev/null 2>&1 
+    $FC ${FFLAGS} fort_netcdf.f -o fort_netcdf -L${NETCDF}/lib/Intel $NETCDFF -lnetcdf > /dev/null 2>&1 
     if [ -f "fort_netcdf" ] ; then
       ./fort_netcdf > /dev/null 2>&1
       if [ $? = 0 ]; then

@@ -16,7 +16,7 @@
 SHELL           	=       /bin/sh
 
 NCARG_LIBS		=	-L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c \
-				-lX11 -lXext -lpng -lz -lcairo -lfontconfig -lpixman-1 \
+				-lX11 -lXext -lpng -lz -L/apps/py/cairo/1.12.14/lib  -lcairo -lfontconfig -lpixman-1 \
 				-lfreetype -lexpat -lpthread -lbz2 -lXrender -lgfortran -lgcc
 
 NCARG_LIBS2		=	# May be overridden by architecture specific value below
@@ -59,13 +59,13 @@ WRF_INCLUDE     =       -I$(WRF_DIR)/external/io_netcdf \
                         -I$(WRF_DIR)/external/io_grib1 \
                         -I$(WRF_DIR)/external/io_int \
                         -I$(WRF_DIR)/inc \
-                        -I$(NETCDF)/include
+                        -I$(NETCDF)/include/Intel
 
 WRF_LIB         =       -L$(WRF_DIR)/external/io_grib1 -lio_grib1 \
                         -L$(WRF_DIR)/external/io_grib_share -lio_grib_share \
                         -L$(WRF_DIR)/external/io_int -lwrfio_int \
                         -L$(WRF_DIR)/external/io_netcdf -lwrfio_nf \
-                        -L$(NETCDF)/lib CONFIGURE_NETCDFF_LIB -lnetcdf
+                        -L$(NETCDF)/lib/Intel CONFIGURE_NETCDFF_LIB -lnetcdf
 
 #### Architecture specific settings ####
 
