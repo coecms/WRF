@@ -18,6 +18,7 @@
 !                 stored.                                                     !
 !       gribflnm     : File name to open, if it is not already open.          !
 !       debug_level  : Integer for various amounts of printout.               !
+!       pmin         : Minimum pressure level (Pa) to process.                !
 !                                                                             !
 !    Output:                                                                  !
 !                                                                             !
@@ -35,7 +36,7 @@
 !*****************************************************************************!
       
       SUBROUTINE rd_grib2(junit, gribflnm, hdate, 
-     &  grib_edition, ireaderr, debug_level)
+     &  grib_edition, ireaderr, debug_level, pmin)
 
       use grib_mod
       use params
@@ -75,6 +76,7 @@
       integer , dimension(maxlvl) :: level_array
       real :: glevel1, glevel2
       logical :: first = .true.
+      real :: pmin
 
 C - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 C  SET ARGUMENTS
@@ -327,6 +329,18 @@ C  SET ARGUMENTS
            else
              map%source = 'unknown model and orig center'
            end if
+           if (icenter.eq.7) then
+             if (iprocess.eq.81 .or. iprocess.eq.82 .or.
+     &           iprocess.eq.96) then
+!  pmin should not be 15 or 40 hPa for gfs files. Use the next highest level.
+               if (pmin .eq. 1500.) then
+                 pmin = 1000.
+               else if (pmin .eq. 4000.) then
+                 pmin = 3000.
+               endif
+             endif
+           endif
+
            call mprintf(.true.,DEBUG,"G2 source is = %s ",
      &                  newline=.true., s1=map%source)
 
@@ -490,6 +504,41 @@ C  SET ARGUMENTS
      &     newline=.true.,f1=map%dx,f2=map%dy,f3=map%lat1,f4=map%lon1,
      &     i1=nint(map%dy))
               end if
+           elseif (gfld%igdtnum.eq.32769) then ! Arakawa Non-E Staggered grid.
+              map%igrid = 6               
+              map%nx = gfld%igdtmpl(8)        
+              map%ny = gfld%igdtmpl(9)        
+              map%dx = gfld%igdtmpl(17)        
+              map%dy = gfld%igdtmpl(18)       
+              map%lat1 = gfld%igdtmpl(12)        
+              map%lon1 = gfld%igdtmpl(13)        
+              map%lat0 = gfld%igdtmpl(15)        
+              map%lon0 = gfld%igdtmpl(16)        
+              map%r_earth = earth_radius (gfld%igdtmpl(1),
+     &                         gfld%igdtmpl(2),gfld%igdtmpl(3))
+              if ((gfld%igdtmpl(10) .eq. 0).OR.
+     &            (gfld%igdtmpl(10) .eq. 255)) THEN
+                map%lat1 = map%lat1/scale_factor
+                map%lon1 = map%lon1/scale_factor
+                map%lat0 = map%lat0/scale_factor
+                map%lon0 = map%lon0/scale_factor
+                map%dx = map%dx/scale_factor/1.e3
+                map%dy = map%dy/scale_factor/1.e3
+              else
+          ! Basic angle and subdivisions are non-zero (not tested)
+                map%lat1 = map%lat1 *
+     &                     (gfld%igdtmpl(11)/gfld%igdtmpl(10))
+                map%lon1 = map%lon1 *
+     &                     (gfld%igdtmpl(11)/gfld%igdtmpl(10))
+                map%dx = map%dx * 
+     &                     (gfld%igdtmpl(11)/gfld%igdtmpl(10))
+                map%dy = map%dy * 
+     &                     (gfld%igdtmpl(11)/gfld%igdtmpl(10))
+               call mprintf(.true.,STDOUT,"WARNING - Basic angle option 
+     &has not been tested, continuing anyway")
+               call mprintf(.true.,LOGFILE,"WARNING - Basic angle option 
+     & has not been tested, continuing anyway")
+              endif
 
            else
               call mprintf(.true.,STDOUT,"GRIB2 Unknown Projection: %i",
@@ -706,6 +755,7 @@ C  SET ARGUMENTS
                  ! Pressure level (range from 1000mb to 0mb)
                  level=gfld%ipdtmpl(12) *
      &                           (10. ** (-1. * gfld%ipdtmpl(11)))
+		 if ( level .lt. pmin ) cycle MATCH_LOOP
               elseif((gfld%ipdtmpl(10).eq.105).or.
      &               (gfld%ipdtmpl(10).eq.118))then
                  ! Hybrid level (range from 1 to N)
@@ -719,6 +769,7 @@ C  SET ARGUMENTS
               elseif(gfld%ipdtmpl(10).eq.103) then
 	         ! Height above ground (m)
 		 if (gfld%ipdtmpl(12) .eq. 2. .or. 
+     &               gfld%ipdtmpl(12) .eq. 1000. .or.     ! temp fix for hrrr maxref
      &               gfld%ipdtmpl(12) .eq. 10. ) then
                    level=200100.
 		 else
@@ -728,6 +779,7 @@ C  SET ARGUMENTS
      &               gfld%ipdtmpl(10).le.234) .or.
      &              (gfld%ipdtmpl(10).ge.242 .and.     
      &               gfld%ipdtmpl(10).le.254) .or.
+     &              (gfld%ipdtmpl(10).eq.200) .or.
      &              (gfld%ipdtmpl(10).eq.10) ) then
                  ! NCEP cloud layers used for plotting
                    level=200100.

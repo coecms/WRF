@@ -16,7 +16,8 @@
 SHELL           	=       /bin/sh
 
 NCARG_LIBS		=	-L$(NCARG_ROOT)/lib -lncarg -lncarg_gks -lncarg_c \
-				-lgfortran -L/apps/py/cairo/1.12.14/lib -lcairo -L/usr/X11R6/lib -lX11
+				-lX11 -lXext -lpng -lz -lcairo -lfontconfig -lpixman-1 \
+				-lfreetype -lexpat -lpthread -lbz2 -lXrender -lgfortran -lgcc
 
 NCARG_LIBS2		=	# May be overridden by architecture specific value below
 
@@ -31,7 +32,27 @@ PERL			=	perl
 
 RANLIB			=	echo
 
-WRF_DIR			=	../WRFV3
+#
+# Look for compiled WRF code in one of several directories: WRF-4.0.1, WRF-4.0, WRF, and WRFV3.
+# The need for complicated logic to do this arises from the various names that the WRF code may take
+# on, depending on whether it was obtained through a GitHub archive file, as a clone of the GitHub
+# repository, or an older WRF v3.x tar file.
+# To override the path to the compiled WRF code, just set the WRF_DIR variable after the "endif" below
+#
+ifneq ($(wildcard $(DEV_TOP)/../WRF-4.0.1), ) # Check for WRF v4.0.1 directory (probably GitHub archive)
+	WRF_DIR = ../WRF-4.0.1
+else
+ifneq ($(wildcard $(DEV_TOP)/../WRF-4.0), )   # Check for WRF v4.0 directory (probably GitHub archive)
+	WRF_DIR = ../WRF-4.0
+else
+ifneq ($(wildcard $(DEV_TOP)/../WRF), )       # Check for clone of the WRF repository
+	WRF_DIR = ../WRF
+else                                          # Check for old WRF v3.x directory
+	WRF_DIR = ../WRFV3
+endif
+endif
+endif
+
 
 WRF_INCLUDE     =       -I$(WRF_DIR)/external/io_netcdf \
                         -I$(WRF_DIR)/external/io_grib_share \
