@@ -33,7 +33,7 @@ while true; do
 	-d) debug=-d; shift ;;
 	-s) opt=-s; shift ;;
 	-f) opt=-f; shift ;;
-        -t|--test) test="-W block=true"; shift ;;
+    -t|--test) test="-W block=true"; shift ;;
 	--chem) chem=1; shift ;;
 	--compile_case) compile_case="$2"; shift 2 ;;
 	-a|--architecture) architecture="$2"; shift 2 ;;
