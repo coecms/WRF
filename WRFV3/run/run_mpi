@@ -5,6 +5,7 @@
 #PBS -j oe
 #PBS -q express
 #PBS -l wd
+#PBS -W umask=0022
 
 source ../../build.env
 limit stacksize unlimited
