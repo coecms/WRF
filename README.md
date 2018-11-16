@@ -18,6 +18,7 @@ Versions currently available:
 * V3.8.1
 * V3.9
 * V3.9.1.1
+* V4.0.2
 
 Building WRF (ARW)
 ==================
