@@ -61,6 +61,12 @@ foreach a ( $argv )
   else if   ( "$a" ==  "em_real" ) then
     set arglist = ( $arglist $a )
     set ZAP = ( main/wrf.exe main/real.exe main/ndown.exe main/tc.exe )
+
+    # Check if configure run for Chemistry
+    grep "WRF_CHEM	=	1 " configure.wrf > /dev/null
+    if ( ! $status ) then
+       setenv WRF_CHEM 1
+    endif
   else if   ( `echo $a | cut -c 1-3` == "em_" ) then
     set arglist = ( $arglist $a )
     set ZAP = ( main/wrf.exe main/ideal.exe )
