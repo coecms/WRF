@@ -72,6 +72,7 @@ if [[ ${help_text} == 1 ]]; then
     # Nest
     echo "-n, --nest  followed by a number (default 1)."
     echo "    This option defines the type of nest used by WRF"
+    echo "        0   no nest"
     echo "        1   basic"
     echo "        2   preset moves"
     echo "        3   vortex following"
