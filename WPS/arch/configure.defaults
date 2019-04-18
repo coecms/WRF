@@ -231,7 +231,7 @@ COMPRESSION_INC     = CONFIGURE_COMP_I
 FDEFS               = CONFIGURE_FDEFS
 SFC                 = ifort
 SCC                 = icc
-DM_FC               = mpif90 -f90=ifort
+DM_FC               = mpif90 -f90=ifort -qopenmp
 DM_CC               = mpicc -cc=icc
 FC                  = CONFIGURE_FC
 CC                  = CONFIGURE_CC
