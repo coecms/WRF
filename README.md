@@ -19,6 +19,7 @@ Versions currently available:
 * V3.9
 * V3.9.1.1
 * V4.0.2
+* V4.1.1 (default)
 
 Building WRF (ARW)
 ==================
@@ -112,3 +113,4 @@ Tests simulations have been done on [Jenkins](https://accessdev.nci.org.au/jenki
 * First tutorial case (Jan 00) with 2 nests
 * First tutorial case (Jan 00) with additional diagnostics turned on.
 WRF outputs for these tests can be found under /projects/WRF/data/KGO/. The inputs for the tests can be found in https://github.com/coecms/wrf-testing
+Note: wps-era is currently being tested for WRF v4.1.1 compatibility to create boundary conditions from ERA-Interim.
