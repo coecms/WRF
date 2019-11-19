@@ -1,9 +1,9 @@
 # WRF
-WRF ported on NCI machine
+WRF ported on NCI machine: Raijin
 
 Installing
 ==========
-To use at NCI, run:
+To use on Raijin, run:
 ```
      git clone -b <VERSION> https://github.com/coecms/WRF.git
 ```
@@ -15,10 +15,10 @@ where version is the WRF version you want to use.
 
 Versions currently available:
 =============================
-* V3.8.1
-* V3.9
-* V3.9.1.1
-* V4.0.2
+* V3.8.1_raijin
+* V3.9_raijin
+* V3.9.1.1_raijin
+* V4.0.2_raijin
 
 Building WRF (ARW)
 ==================
