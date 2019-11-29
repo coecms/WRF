@@ -1,12 +1,16 @@
 #!/bin/bash
-#PBS -l walltime=300
-#PBS -l mem=4GB
-#PBS -l ncpus=4
-#PBS -j oe
+# Runs all the WPS steps for the JAN00 testcase
+# Please modify as necessary.
+
 #PBS -q express
+#PBS -l walltime=15:00
+#PBS -l ncpus=4
+#PBS -l mem=4gb
 #PBS -l wd
+#PBS -l storage=scratch/$PROJECT+gdata/$PROJECT+gdata/sx70
 #PBS -W umask=0022
-#PBS -l storage=scratch/$PROJECT+gdata/$PROJECT
+
+set -eu
 
 # ------- USER UPDATE NECESSARY
 # To allow running on /scratch with the source code on /home or /g/data
@@ -18,17 +22,21 @@ if [ -z "${WRF_ROOT+x}" ]; then
 fi
 # -------------------------------
 
-source ${WRF_ROOT}/build.env
-ulimit -s unlimited
-
-if [ -x "${WRF_ROOT}/WRFV3/main/real.exe" ]; then
-    export PATH="${WRF_ROOT}/WRFV3/main:${PATH}"
+if [ -x "${WRF_ROOT}/WPS/geogrid.exe" ]; then
+    export PATH="${WRF_ROOT}/WPS:${PATH}"
 else
-    echo "ERROR: WRF not found"
+    echo "ERROR: WPS not found"
     exit 1
 fi
 
-echo running with $PBS_NCPUS mpi ranks
-time mpirun -np $PBS_NCPUS real.exe
+source ${WRF_ROOT}/build.env
 
-echo "real.exe is finished."
+geogrid.exe
+
+link_grib.csh /g/data/sx70/data/JAN00_v4/fnl_2000012
+
+ungrib.exe
+
+metgrid.exe
+
+echo "WPS finished."

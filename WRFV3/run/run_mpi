@@ -1,14 +1,35 @@
-#!/bin/tcsh
+#!/bin/bash
 #PBS -l walltime=300
-#PBS -l mem=1GB
+#PBS -l mem=4GB
 #PBS -l ncpus=4
 #PBS -j oe
 #PBS -q express
 #PBS -l wd
 #PBS -W umask=0022
+#PBS -l storage=scratch/$PROJECT+gdata/$PROJECT
 
-source ../../build.env
-limit stacksize unlimited
+# ------- USER UPDATE NECESSARY
+# To allow running on /scratch with the source code on /home or /g/data
+# we now add the path to the WRF executables to the path.
+# You can either set the WRF_ROOT variable value via the `-v` option
+# for qsub or change the value below within the if statement.
+if [ -z "${WRF_ROOT+x}" ]; then
+    WRF_ROOT=$HOME/WRF
+fi
+# -------------------------------
+
+source ${WRF_ROOT}/build.env
+ulimit -s unlimited
+
+if [ -x "${WRF_ROOT}/WRFV3/main/wrf.exe" ]; then
+    export PATH="${WRF_ROOT}/WRFV3/main:${PATH}"
+else
+    echo "ERROR: WRF not found"
+    exit 1
+fi
+
 
 echo running with $PBS_NCPUS mpi ranks
-time mpirun -np $PBS_NCPUS -report-bindings ./wrf.exe
+time mpirun -np $PBS_NCPUS wrf.exe
+
+echo "wrf.exe finished."
