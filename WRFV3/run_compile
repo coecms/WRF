@@ -176,6 +176,7 @@ qsub $test -N compile_job <<EOF_compile
 #PBS -l wd
 #PBS -W umask=0022
 #PBS -l software=intel-compiler
+#PBS -l storage=gdata/$PROJECT+scratch/$PROJECT
 
 # Set the value of compile_case
 compile_case=${compile_case}
