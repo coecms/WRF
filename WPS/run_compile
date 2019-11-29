@@ -86,13 +86,14 @@ EOF_configure
 
 qsub $test -N compile_wps <<EOF_compile
 #PBS -l walltime=1800
-#PBS -l mem=600MB
+#PBS -l mem=2GB
 #PBS -l ncpus=1
 #PBS -q express
 #PBS -l wd
 #PBS -j oe
 #PBS -l software=intel-compiler
 #PBS -W umask=0022
+#PBS -l storage=gdata/$PROJECT+scratch/$PROJECT
 
 source ../build.env
 
