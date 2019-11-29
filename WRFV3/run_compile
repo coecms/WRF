@@ -161,9 +161,9 @@ EOF_configure
 echo Submitting the compilation to the express queue. Allow for about 40min to finish. Use the nqstat command to check status.
 qsub $test -N compile_job <<EOF_compile
 #!/bin/bash
-#PBS -l walltime=1:00:00
+#PBS -l walltime=1:30:00
 #PBS -l mem=10GB
-#PBS -l ncpus=8
+#PBS -l ncpus=$NPROC
 #PBS -j oe
 #PBS -q express
 #PBS -l wd
