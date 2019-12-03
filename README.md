@@ -39,6 +39,12 @@ If you want more aggressive optimisation options on Cascade Lake nodes, please u
 ```
 ./run_compile -a 75
 ```
+NOTE: with both the default options and the more aggressive optimisation options, the results are not reproducible in some cases. For example, you do not get the same output with I/O quilting on or off. If you want to ensure getting the same results, you would need to run:
+```
+./run_compile -a 16
+```
+But this results in a much slower code.
+
 The configure step will be run interactively with the output on your screen, then the compilation step will be submitted to the express queue automatically.
 
 After a successful build, one should see the following executable files for WRF (the ARW core):
