@@ -3,7 +3,7 @@
 # Please modify as necessary.
 
 #PBS -q express
-#PBS -l walltime=15:00
+#PBS -l walltime=25:00
 #PBS -l ncpus=4
 #PBS -l mem=4gb
 #PBS -l wd
