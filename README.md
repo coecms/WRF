@@ -122,4 +122,4 @@ Tests simulations have been done on [Jenkins](https://accessdev.nci.org.au/jenki
 * First tutorial case (Jan 00) with quiting I/O.
 * First tutorial case (Jan 00) with restart
 WRF outputs for these tests can be found under /projects/WRF/data/KGO/. The inputs for the tests can be found in https://github.com/coecms/wrf-testing
-Note: wps-era is currently being tested for WRF v4.1.1 compatibility to create boundary conditions from ERA-Interim.
+Note: wps-era is currently being tested for WRF v4.1.2 compatibility to create boundary conditions from ERA-Interim.
