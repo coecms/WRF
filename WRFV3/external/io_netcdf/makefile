@@ -3,9 +3,9 @@
 OBJSL   = wrf_io.o field_routines.o module_wrfsi_static.o
 OBJS    = $(OBJSL)
 CODE    = ext_ncd_get_dom_ti.code ext_ncd_get_var_td.code ext_ncd_get_var_ti.code ext_ncd_put_dom_ti.code ext_ncd_put_var_td.code ext_ncd_put_var_ti.code transpose.code 
-FFLAGS  =  $(FCFLAGS) -I$(NETCDFPATH)/include -I../ioapi_share
-LIBS    = $(LIB_LOCAL) -L$(NETCDFPATH)/lib -lnetcdf
-LIBFFS  = $(LIB_LOCAL) -L$(NETCDFPATH)/lib -lnetcdff -lnetcdf $(NETCDF4_DEP_LIB)
+FFLAGS  =  $(FCFLAGS) -I$(NETCDFPATH)/include/Intel -I../ioapi_share
+LIBS    = $(LIB_LOCAL) -L$(NETCDFPATH)/lib/Intel -lnetcdf
+LIBFFS  = $(LIB_LOCAL) -L$(NETCDFPATH)/lib/Intel -lnetcdff -lnetcdf $(NETCDF4_DEP_LIB)
 CPP1    = $(CPP) -P $(TRADFLAG)
 M4      = m4 -Uinclude -Uindex -Ulen
 AR      = ar
@@ -24,7 +24,7 @@ libwrfio_nf.a:         $(OBJS) $(CODE)
 			$(RANLIB) $@
 
 wrf_io.o:               wrf_io.F90 $(CODE)
-			grep nf_format_64bit $(NETCDFPATH)/include/netcdf.inc ;\
+			grep nf_format_64bit $(NETCDFPATH)/include/Intel/netcdf.inc ;\
                         a=$$? ; export a ; \
 			if [ $$a -a "$$WRFIO_NCD_LARGE_FILE_SUPPORT" = "1" ] ; then \
                           $(CPP1) -DWRFIO_NCD_LARGE_FILE_SUPPORT -I../ioapi_share wrf_io.F90 | $(M4) - > wrf_io.f ; \
@@ -43,9 +43,9 @@ diffwrf:                diffwrf.F90
 	x=`echo "$(FC)" | awk '{print $$1}'` ; export x ; \
 	if [ $$x = "gfortran" ] ; then \
            echo removing external declaration of iargc for gfortran ; \
-	   $(CPP1) -I$(NETCDFPATH)/include -I../ioapi_share diffwrf.F90 | sed '/integer *, *external.*iargc/d' > diffwrf.f ;\
+	   $(CPP1) -I$(NETCDFPATH)/include/Intel -I../ioapi_share diffwrf.F90 | sed '/integer *, *external.*iargc/d' > diffwrf.f ;\
         else \
-	   $(CPP1) -I$(NETCDFPATH)/include -I../ioapi_share diffwrf.F90 > diffwrf.f ; \
+	   $(CPP1) -I$(NETCDFPATH)/include/Intel -I../ioapi_share diffwrf.F90 > diffwrf.f ; \
         fi
 	$(FC) -c $(FFLAGS) diffwrf.f
 	@if [ \( -f ../../frame/wrf_debug.o \) -a \( -f ../../frame/module_wrf_error.o \) -a \( -f $(ESMF_MOD_DEPENDENCE) \) -a \( -f ../../frame/clog.o \) ] ; then \
