@@ -3,12 +3,15 @@
 *.o
 *.mod
 *.exe
+compile_job.o*
 
 # WRF/WPS temporary files
 #########################
+namelist.input.backup*
 WPS/GRIBFILE.*
 WPS/Vtable
 WPS/geo_em.*
+WRFV3/Registry/Registry
 WRFV3/Registry/io_boilerplate_temporary.inc
 WRFV3/external/io_int/io_int_idx_tags.h
 WRFV3/external/io_int/test_io_idx
