@@ -1,9 +1,9 @@
 # WRF
-WRF ported on NCI machine: Raijin
+WRF ported on NCI machine: Gadi
 
 Installing
 ==========
-To use on Raijin, run:
+You can install WRF on any filesystem on Gadi: /home, /g/data or /scratch. Keep in mind /scratch is purged regularly. It isn't a problem if you are using WRF without modifications (easy to reinstall from here) but you would need to save any code modifications on a different filesystem (or Github etc.). To use on Gadi, run:
 ```
      git clone -b <VERSION> https://github.com/coecms/WRF.git
 ```
@@ -15,18 +15,15 @@ where version is the WRF version you want to use.
 
 Versions currently available:
 =============================
-* V3.8.1_raijin
-* V3.9_raijin
-* V3.9.1.1_raijin
-* V4.0.2_raijin
+* V4.0.2
 
 Building WRF (ARW)
 ==================
 Go to the WRFV3/ subdirectory, run:
 ```
-cd /short/$PROJECT/$USER/WRF/WRFV3/
+cd WRF/WRFV3/
 ```
-There is a *run_compile* script to help you configure and compile WRF. This script by default will compile the WRFV3 software for a real experiment, with speed optimisations for the normal and express queues and with basic nesting. There is a range of command-line arguments accepted by the script. These are the command-line arguments accepted by the *configure* script, an option to clean everything prior to compilation, the choice of compilation flags and nesting type for the *configure* script and finally the compilation option for the *compile* script. You can access a full list and description by running:
+There is a run_compile script to help you configure and compile WRF. This script by default will compile the WRFV3 software for a real experiment, with some speed optimisations for the normal and express queues and with basic nesting. There is a range of command-line arguments accepted by the script. These are the command-line arguments accepted by the configure script, an option to clean everything prior to compilation, the choice of compilation flags and nesting type for the configure script and finally the compilation option for the compile script. You can access a full list and description by running:
 ```
 ./run_compile -h
 ```
@@ -34,8 +31,17 @@ To configure and compile WRFV3 with the default options, you simply run:
 ```
 ./run_compile
 ```
-The configure step will be run interactively with the output on your screen, then the compilation step will be submitted to the express queue automatically.
+If you want more aggressive optimisation options on Cascade Lake nodes, please use:
+```
+./run_compile -a 75
+```
+NOTE: with both the default options and the more aggressive optimisation options, the results are not reproducible in some cases. For example, you do not get the same output with I/O quilting on or off. If you want to ensure getting the same results, you would need to run:
+```
+./run_compile -a 16
+```
+But this results in a much slower code.
 
+The configure step will be run interactively with the output on your screen, then the compilation step will be submitted to the express queue automatically.
 After a successful build, one should see the following executable files for WRF (the ARW core):
 ```
 [abc123@raijin3 WRFV3]$ ls -l main/*.exe
@@ -61,7 +67,7 @@ Building WPS
 ============
 Go to the WPS/ subdirectory, run:
 ```
-cd /short/$PROJECT/$USER/WRF/WPS/
+cd WRF/WPS/
 ```
 There is another *run_compile* script to help with configuring and compiling WPS. You can again choose the configure input from the command-line option as well as to clean a previous compilation of WPS. The default is to compile with GRIB2 support and a distributed memory code. See the inline help for *run_compile* for a full explanation:
 ```
@@ -75,6 +81,8 @@ To configure and compile WPS with the default options, you simply run:
 A file configure.wps should be created after configuring has completed.
 
 After a successful build, one should see the following executable files:
+Currently the executables in util/ are not available as NCL isn't available on Gadi.
+The code will be ported for those afterwards.
 ```
 [abc123@raijin3 WPS]$ ls -l *.exe
 
@@ -111,4 +119,5 @@ Tests simulations have been done on [Jenkins](https://accessdev.nci.org.au/jenki
 * First tutorial case (Jan 00) with 1 nest
 * First tutorial case (Jan 00) with 2 nests
 * First tutorial case (Jan 00) with additional diagnostics turned on.
-WRF outputs for these tests can be found under /projects/WRF/data/KGO/. The inputs for the tests can be found in https://github.com/coecms/wrf-testing
+* First tutorial case (Jan 00) with restart
+WRF outputs for these tests can be found under /g/data/sx70/data/KGO/. The inputs for the tests can be found in https://github.com/coecms/wrf-testing
