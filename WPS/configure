@@ -120,7 +120,7 @@ if [ -n "$NETCDF" ] ; then
   # for 3.6.2 and greater there might be a second library, libnetcdff.a .  Check for this and use
   # if available
   NETCDFF="-lnetcdff"
-  if [ -f "$NETCDF/lib/libnetcdff.a" ] ; then
+  if [ -f "$NETCDF/lib/Intel/libnetcdff.a" ] ; then
     NETCDFF="-lnetcdff"
   fi
 else
@@ -317,9 +317,9 @@ cat > fort_netcdf.f <<EOF
         end program
 EOF
     FFLAGS=`grep ^FFLAGS configure.wps | cut -d"=" -f2-`
-    cp $NETCDF/include/netcdf.inc .
+    cp $NETCDF/include/Intel/netcdf.inc .
     FC=`grep ^SFC configure.wps | cut -d"=" -f2-`
-    $FC ${FFLAGS} fort_netcdf.f -o fort_netcdf -L${NETCDF}/lib $NETCDFF -lnetcdf > /dev/null 2>&1 
+    $FC ${FFLAGS} fort_netcdf.f -o fort_netcdf -L${NETCDF}/lib/Intel $NETCDFF -lnetcdf > /dev/null 2>&1 
     if [ -f "fort_netcdf" ] ; then
       ./fort_netcdf > /dev/null 2>&1
       if [ $? = 0 ]; then
