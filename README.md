@@ -19,7 +19,10 @@ where version is the WRF version you want to use.
 
 Versions currently available:
 =============================
+* V4.1.3
+* V4.1.2
 * V4.1.1
+* V4.0.2
 
 Building WRF (ARW)
 ==================
@@ -88,6 +91,8 @@ To configure and compile WPS with the default options, you simply run:
 A file configure.wps should be created after configuring has completed.
 
 After a successful build, one should see the following executable files:
+Currently the executables in util/ are not available as NCL isn't available on Gadi.
+The code will be ported for those afterwards.
 ```
 [abc123@gadi WPS]$ ls -l *.exe
 
