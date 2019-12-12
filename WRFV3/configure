@@ -300,7 +300,7 @@ if [ -n "$NETCDF" ] ; then
   else
     USENETCDFF=" "
   fi
-  if [ -f "$NETCDF/lib/Intel/libnetcdf.a" -o -f "$NETCDF/lib/Intel/libnetcdf.so" ] ; then
+  if [ -f "$NETCDF/lib/libnetcdf.a" -o -f "$NETCDF/lib/libnetcdf.so" ] ; then
     USENETCDF="-lnetcdf"
   else
     USENETCDF=" "
@@ -745,9 +745,9 @@ echo "If you wish to change the default options, edit the file:"
 echo "     arch/configure_new.defaults"
 
 if test -n "$NETCDF" ; then
-  if [ ! -f $NETCDF/include/netcdf.inc ] ; then
+  if [ ! -f $NETCDF/include/Intel/netcdf.inc ] ; then
     echo
-    echo "Error : Not found $NETCDF/include/netcdf.inc"
+    echo "Error : Not found $NETCDF/include/Intel/netcdf.inc"
     echo "        Please check this installation of NetCDF and re-run this configure script"
     echo
     if test -n "$NETCDF4" ; then
@@ -756,7 +756,7 @@ if test -n "$NETCDF" ; then
     fi
     exit -1
   fi
-  grep nf_format_64bit $NETCDF/include/netcdf.inc > /dev/null
+  grep nf_format_64bit $NETCDF/include/Intel/netcdf.inc > /dev/null
   configure_aaaa=$? ; export configure_aaaa
   if [ $configure_aaaa -a -z "$WRFIO_NCD_NO_LARGE_FILE_SUPPORT" ] ; then
     echo "NetCDF users note:"
