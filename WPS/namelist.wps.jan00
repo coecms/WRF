@@ -23,7 +23,7 @@
  truelat1  =  30.0,
  truelat2  =  60.0,
  stand_lon = -98.0,
- geog_data_path = '/g/data/sx70/data/WPS_GEOG_v4'
+ geog_data_path = '/g/data/sx70/data/WPS_GEOG_v3'
 /
 
 &ungrib
