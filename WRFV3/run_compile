@@ -67,8 +67,6 @@ if [[ ${help_text} == 1 ]]; then
     echo "               (5=serial, 6=smpar, 7=dmpar, 8=sm+dm)"
     echo "        9-12   optimisation for Broadwell processors (expressbw/normalbw queues)"
     echo "               (9=serial, 10=smpar, 11=dmpar, 12=sm+dm)"
-    echo "        13-16  optimisation for Knights Landing processors (knl queue)"
-    echo "               (13=serial, 14=smpar, 15=dmpar, 16=sm+dm)"
     echo 
 
     # Nest
@@ -156,6 +154,13 @@ fi
 $architecture
 $nest
 EOF_configure
+
+# Select queue depending on architecture option
+QUEUE=express
+NPROC=8
+if [[ $architecture > 9 && $architecture < 12 ]]; then
+    QUEUE=expressbw
+fi
 
 # submit compile to the queue.
 echo Submitting the compilation to the express queue. Allow for about 40min to finish. Use the nqstat command to check status.
