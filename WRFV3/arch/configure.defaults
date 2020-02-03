@@ -1917,7 +1917,7 @@ RLFLAGS		=
 CC_TOOLS        =      $(SCC) 
 
 ###########################################################
-#ARCH    Linux x86_64 ppc64le i486 i586 i686 #serial smpar dmpar dm+sm
+#ARCH    Linux CL/SL x86_64 ppc64le i486 i586 i686 #serial smpar dmpar dm+sm
 #
 DESCRIPTION     =       INTEL ($SFC/$SCC): CL/SL
 DMPARALLEL      =       # 1
@@ -1961,7 +1961,7 @@ RLFLAGS		=
 CC_TOOLS        =      $(SCC) 
 
 ###########################################################
-#ARCH    Linux x86_64 ppc64le i486 i586 i686 #serial smpar dmpar dm+sm
+#ARCH    Linux CL/SLcons x86_64 ppc64le i486 i586 i686 #serial smpar dmpar dm+sm
 #
 DESCRIPTION     =       INTEL ($SFC/$SCC): CL/SL less opt
 DMPARALLEL      =       # 1
