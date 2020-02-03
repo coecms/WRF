@@ -164,8 +164,7 @@ if [[ $architecture > 67 && $architecture < 72 ]]; then
 fi
 
 # submit compile to the queue.
-echo Submitting the compilation to the express queue. Allow for about 40min to finish. Use the nqstat command to check status.
-#cat <<EOF_compile
+echo Submitting the compilation to the express queue. Allow for about 40min to finish. Use the qstat command to check status.
 qsub $test -N compile_job <<EOF_compile
 #!/bin/bash
 #PBS -l walltime=1:30:00
