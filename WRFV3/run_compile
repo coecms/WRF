@@ -12,14 +12,15 @@ opt=""
 chem=""
 help_text=0
 compile_case=em_real
-architecture=7
+architecture=24
 nest=1
 clean=0
 netcdf4=0
+test=""
 
 # Read in command line arguments (code is a mix from https://stackoverflow.com/questions/192249/how-do-i-parse-command-line-arguments-in-bash and man getopt example) 
-SHORT=Ddsfha:n:c
-LONG=compile_case:,architecture:,nest:,help,chem,clean,netcdf4
+SHORT=Ddsfhta:n:c
+LONG=compile_case:,architecture:,nest:,help,chem,clean,netcdf4,test
 
 PARSED=$(getopt --options $SHORT --longoptions $LONG --name "$0" -- "$@")
 if [[ $? != 0 ]] ; then echo "Wrong arguments. Terminating..." >&2 ; exit 1 ; fi
@@ -33,6 +34,7 @@ while true; do
 	-d) debug=-d; shift ;;
 	-s) opt=-s; shift ;;
 	-f) opt=-f; shift ;;
+        -t|--test) test="-W block=true"; shift ;;
 	--chem) chem=1; shift ;;
 	--compile_case) compile_case="$2"; shift 2 ;;
 	-a|--architecture) architecture="$2"; shift 2 ;;
@@ -49,10 +51,10 @@ if [[ ${help_text} == 1 ]]; then
     echo "The optional arguments are:"
 
     # Architecture
-    echo "-a, --architecture  followed by a number (default 7). "
+   echo "-a, --architecture  followed by a number (default 24). "
     echo "    This is the first input required by configure to choose the compilation options."
-    echo "    There are 16 different possibilities. "
-    echo "    There are 4 processor options and each have 4 parallelisation options."
+    echo "    There are 8 different possibilities. "
+    echo "    There are 2 optimisation options and each have 4 parallelisation options."
     echo "    The parallelisation options are:"
     echo "        serial  no parallelisation, runs on 1 processor"
     echo "        smpar   shared memory parallelisation"
@@ -60,13 +62,9 @@ if [[ ${help_text} == 1 ]]; then
     echo "        sm+dm   shared and distributed memory parallelisation"
     
     echo "    The architecture choices are:"
-    echo "        1-4    best precision (1=serial, 2=smpar, 3=dmpar, 4=sm+dm)"
-    echo "        5-8    optimisation for Sandy Bridge processors (express/normal queues)"
-    echo "               (5=serial, 6=smpar, 7=dmpar, 8=sm+dm)"
-    echo "        9-12   optimisation for Broadwell processors (expressbw/normalbw queues)"
-    echo "               (9=serial, 10=smpar, 11=dmpar, 12=sm+dm)"
-    echo "        13-16  optimisation for Knights Landing processors (knl queue)"
-    echo "               (13=serial, 14=smpar, 15=dmpar, 16=sm+dm)"
+    echo "        21-24    best precision on Cascade Lake (21=serial, 22=smpar, 23=dmpar, 24=sm+dm)"
+    echo "        17-20    optimisation for Cascade Lake processors "
+    echo "               (17=serial, 18=smpar, 19=dmpar, 20=sm+dm)"
     echo 
 
     # Nest
@@ -105,6 +103,10 @@ if [[ ${help_text} == 1 ]]; then
 
     # Help
     echo "-h, --help  writes this help text"
+    echo
+
+    # Test
+    echo "-t, --test  option for Jenkins tests only"
     exit 0
 fi
 
@@ -137,7 +139,7 @@ if [[ $clean == 1 ]]; then
 fi
 
 # WRF now supports large files per default. Option to turn off the support.
-#export WRFIO_NCD__NO_LARGE_FILE_SUPPORT=1
+#export WRFIO_NCD_NO_LARGE_FILE_SUPPORT=1
 
 # Un-comment to compile with chemistry
 if [[ $chem == 1 ]]; then
@@ -151,17 +153,36 @@ $architecture
 $nest
 EOF_configure
 
+# Select queue depending on architecture option
+QUEUE=express
+NPROC=8
+
+# Find current directory project and path
+fs=`pwd -P`
+if [ ${fs:1:1} = "s" ]
+then
+    # On scratch
+    proj="+scratch/${fs:9:3}"
+else
+    if [ ${fs:1:1} = "g" ]
+    then
+        #On gdata
+        proj="+gdata/${fs:8:3}"
+    fi # If in home, no need to add anything
+fi
 # submit compile to the queue.
-qsub -N compile_job <<EOF_compile
+echo Submitting the compilation to the express queue. Allow for about 40min to finish. Use the nqstat command to check status.
+qsub $test -N compile_job <<EOF_compile
 #!/bin/bash
-#PBS -l walltime=1:00:00
+#PBS -l walltime=1:30:00
 #PBS -l mem=10GB
-#PBS -l ncpus=8
+#PBS -l ncpus=$NPROC
 #PBS -j oe
 #PBS -q express
 #PBS -l wd
 #PBS -W umask=0022
 #PBS -l software=intel-compiler
+#PBS -l storage=gdata/$PROJECT+scratch/$PROJECT$proj
 
 # Set the value of compile_case
 compile_case=${compile_case}

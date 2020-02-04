@@ -6,8 +6,8 @@ COMPRESSION_INC     = CONFIGURE_COMP_I
 FDEFS               = CONFIGURE_FDEFS
 SFC                 = ifort
 SCC                 = icc
-DM_FC               = mpif90 -f90=ifort
-DM_CC               = mpicc -cc=icc
+DM_FC               = mpif90 -qopenmp
+DM_CC               = mpicc -qopenmp
 FC                  = CONFIGURE_FC
 CC                  = CONFIGURE_CC
 LD                  = $(FC)
