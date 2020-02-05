@@ -15,9 +15,12 @@ where version is the WRF version you want to use.
 
 Versions currently available:
 =============================
-* V3.8.1_raijin
-* V3.9_raijin
-* V3.9.1.1_raijin
+* V4.1.3
+* V4.1.2
+* V4.1.1
+* V4.0.2
+* V3.9.1.1
+* V3.7.1
 
 Building WRF (ARW)
 ==================
@@ -33,6 +36,8 @@ To configure and compile WRFV3 with the default options, you simply run:
 ```
 ./run_compile
 ```
+If you want more aggressive optimisation options on Cascade Lake nodes, please refer to the help for the option to use depending on the version you are using.
+
 The configure step will be run interactively with the output on your screen, then the compilation step will be submitted to the express queue automatically.
 
 After a successful build, one should see the following executable files for WRF (the ARW core):
@@ -105,7 +110,7 @@ Tests run
 * WRF compilation with dmpar
 * WRF compilation with dm+sm
 * WPS compilation with distributed memory with dm+sm compilation of WRF
-## Tests simulations
+## Tests simulations (only for versions 4)
 Tests simulations have been done on [Jenkins](https://accessdev.nci.org.au/jenkins/job/WRF/job/WRF-Core/). The simulations were:
 * First tutorial case (Jan 00) with 1 nest
 * First tutorial case (Jan 00) with 2 nests
