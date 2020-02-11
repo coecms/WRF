@@ -84,6 +84,20 @@ fi
 ${architecture}
 EOF_configure
 
+# Find current directory project and path
+fs=`pwd -P`
+if [ ${fs:1:1} = "s" ]
+then
+    # On scratch
+    proj="+scratch/${fs:9:3}"
+else
+    if [ ${fs:1:1} = "g" ]
+    then
+        #On gdata
+        proj="+gdata/${fs:8:3}"
+    fi # If in home, no need to add anything
+fi
+
 qsub $test -N compile_wps <<EOF_compile
 #PBS -l walltime=1800
 #PBS -l mem=2GB
@@ -93,7 +107,7 @@ qsub $test -N compile_wps <<EOF_compile
 #PBS -j oe
 #PBS -l software=intel-compiler
 #PBS -W umask=0022
-#PBS -l storage=gdata/$PROJECT+scratch/$PROJECT
+#PBS -l storage=gdata/$PROJECT+scratch/$PROJECT$proj
 
 source ../build.env
 

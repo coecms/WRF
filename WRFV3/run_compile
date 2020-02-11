@@ -49,10 +49,10 @@ if [[ ${help_text} == 1 ]]; then
     echo "The optional arguments are:"
 
     # Architecture
-    echo "-a, --architecture  followed by a number (default 15). "
+    echo "-a, --architecture  followed by a number (default 79). "
     echo "    This is the first input required by configure to choose the compilation options."
-    echo "    There are 16 different possibilities. "
-    echo "    There are 4 processor options and each have 4 parallelisation options."
+    echo "    There are 8 different possibilities. "
+    echo "    There are 2 optimisation options and each have 4 parallelisation options."
     echo "    The parallelisation options are:"
     echo "        serial  no parallelisation, runs on 1 processor"
     echo "        smpar   shared memory parallelisation"
@@ -60,13 +60,9 @@ if [[ ${help_text} == 1 ]]; then
     echo "        sm+dm   shared and distributed memory parallelisation"
     
     echo "    The architecture choices are:"
-    echo "        13-16    best precision (13=serial, 14=smpar, 15=dmpar, 16=sm+dm)"
-    echo "        18-21    optimisation for Sandy Bridge processors (express/normal queues)"
-    echo "               (18=serial, 19=smpar, 20=dmpar, 21=sm+dm)"
-    echo "        64-67   optimisation for Broadwell processors (expressbw/normalbw queues)"
-    echo "               (64=serial, 65=smpar, 66=dmpar, 67=sm+dm)"
-    echo "        68-71  optimisation for Knights Landing processors (knl queue)"
-    echo "               (68=serial, 69=smpar, 70=dmpar, 71=sm+dm)"
+    echo "        76-79    best precision (76=serial, 77=smpar, 78=dmpar, 79=sm+dm)"
+    echo "        72-75    optimisation for Sandy Bridge processors (express/normal queues)"
+    echo "               (72=serial, 73=smpar, 74=dmpar, 75=sm+dm)"
     echo 
 
     # Nest
@@ -154,13 +150,19 @@ EOF_configure
 # Select queue depending on architecture option
 QUEUE=express
 NPROC=8
-if [[ $architecture > 63 && $architecture < 68 ]]; then
-    QUEUE=expressbw
-fi
 
-if [[ $architecture > 67 && $architecture < 72 ]]; then
-    QUEUE=knl
-    NPROC=64
+# Find current directory project and path
+fs=`pwd -P`
+if [ ${fs:1:1} = "s" ]
+then
+    # On scratch
+    proj="+scratch/${fs:9:3}"
+else
+    if [ ${fs:1:1} = "g" ]
+    then
+        #On gdata
+        proj="+gdata/${fs:8:3}"
+    fi # If in home, no need to add anything
 fi
 
 # submit compile to the queue.
@@ -175,7 +177,7 @@ qsub $test -N compile_job <<EOF_compile
 #PBS -l wd
 #PBS -W umask=0022
 #PBS -l software=intel-compiler
-#PBS -l storage=gdata/$PROJECT+scratch/$PROJECT
+#PBS -l storage=gdata/$PROJECT+scratch/$PROJECT$proj
 
 # Set the value of compile_case
 compile_case=${compile_case}
