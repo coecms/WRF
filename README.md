@@ -20,7 +20,14 @@ where version is the WRF version you want to use.
 Versions currently available:
 =============================
 * V4.1.3
+* V4.1.2
 * V4.1.1
+* V4.0.2
+* V3.9.1.1
+* V3.9
+* V3.7.1
+* V3.6.1
+* V3.6
 
 Building WRF (ARW)
 ==================
@@ -36,10 +43,8 @@ To configure and compile WRFV3 with the default options, you simply run:
 ```
 ./run_compile
 ```
-If you want more aggressive optimisation options on Cascade Lake nodes, please use:
-```
-./run_compile -a 75
-```
+If you want more aggressive optimisation options on Cascade Lake nodes, please refer to the help of run_compile for the version you are using.
+
 The configure step will be run interactively with the output on your screen, then the compilation step will be submitted to the express queue automatically.
 
 After a successful build, one should see the following executable files for WRF (the ARW core):
@@ -83,6 +88,7 @@ To configure and compile WPS with the default options, you simply run:
 A file configure.wps should be created after configuring has completed.
 
 After a successful build, one should see the following executable files:
+(Note: the util/ executables are not yet ported to Gadi)
 ```
 [abc123@gadi WPS]$ ls -l *.exe
 
