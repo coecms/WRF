@@ -23,6 +23,11 @@ Versions currently available:
 * V4.1.2
 * V4.1.1
 * V4.0.2
+* V3.9.1.1
+* V3.9
+* V3.7.1
+* V3.6.1
+* V3.6
 
 Building WRF (ARW)
 ==================
@@ -38,15 +43,9 @@ To configure and compile WRFV3 with the default options, you simply run:
 ```
 ./run_compile
 ```
-If you want more aggressive optimisation options on Cascade Lake nodes, please use:
-```
-./run_compile -a 75
-```
-NOTE: with both the default options and the more aggressive optimisation options, the results are not reproducible in some cases. For example, you do not get the same output with I/O quilting on or off. If you want to ensure getting the same results, you would need to run:
-```
-./run_compile -a 16
-```
-But this results in a much slower code.
+If you want more aggressive optimisation options on Cascade Lake nodes, please refer to the help screen for the *run_compile* script for the WRF version you are using.
+
+NOTE: with both the default options and the more aggressive optimisation options, the results are not reproducible in some cases. For example, you do not get the same output with I/O quilting on or off.
 
 The configure step will be run interactively with the output on your screen, then the compilation step will be submitted to the express queue automatically.
 
