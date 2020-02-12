@@ -53,8 +53,8 @@ if [[ ${help_text} == 1 ]]; then
     # Architecture
     echo "-a, --architecture  followed by a number (default 71). "
     echo "    This is the first input required by configure to choose the compilation options."
-    echo "    There are 16 different possibilities. "
-    echo "    There are 4 processor options and each have 4 parallelisation options."
+    echo "    There are 8 different possibilities. "
+    echo "    There are 2 optimisation options and each have 4 parallelisation options."
     echo "    The parallelisation options are:"
     echo "        serial  no parallelisation, runs on 1 processor"
     echo "        smpar   shared memory parallelisation"
