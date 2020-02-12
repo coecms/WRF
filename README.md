@@ -20,7 +20,10 @@ Versions currently available:
 * V4.1.1
 * V4.0.2
 * V3.9.1.1
+* V3.9
 * V3.7.1
+* V3.6.1
+* V3.6
 
 Building WRF (ARW)
 ==================
@@ -36,7 +39,7 @@ To configure and compile WRFV3 with the default options, you simply run:
 ```
 ./run_compile
 ```
-If you want more aggressive optimisation options on Cascade Lake nodes, please refer to the help for the option to use depending on the version you are using.
+If you want more aggressive optimisation options on Cascade Lake nodes, please refer to the help for the option to use depending on the version you are using. Note that using more optimisation will result in a faster code at the expense of reproducibility of results.
 
 The configure step will be run interactively with the output on your screen, then the compilation step will be submitted to the express queue automatically.
 
@@ -63,6 +66,7 @@ alias my_compile 'run_compile --compile_case <replace with the compile option he
 ```
 Building WPS
 ============
+NOTE: At this time, not all executables at built in WPS because of software availability at NCI. The main executables are built and the version is functional.
 Go to the WPS/ subdirectory, run:
 ```
 cd /short/$PROJECT/$USER/WRF/WPS/
