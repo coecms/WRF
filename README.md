@@ -26,6 +26,7 @@ Versions currently available:
 * V3.9.1.1
 * V3.7.1
 * V3.6.1
+* V3.6
 
 Building WRF (ARW)
 ==================
@@ -41,7 +42,7 @@ To configure and compile WRFV3 with the default options, you simply run:
 ```
 ./run_compile
 ```
-If you want more aggressive optimisation options on Cascade Lake nodes, refer to the help screen of run_compile for the version you are using.
+If you want more aggressive optimisation options on Cascade Lake nodes, refer to the help screen of run_compile for the version you are using. Note, optimisation gives you a faster code at the cost of reproducibility of the results
 
 The configure step will be run interactively with the output on your screen, then the compilation step will be submitted to the express queue automatically.
 
