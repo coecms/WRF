@@ -291,6 +291,7 @@ CONTAINS
      &          ,spp_lsm,pattern_spp_lsm,field_sf                     &  !SPP
      &          ,spp_pbl,pattern_spp_pbl                              &  !SPP
      &          ,XLAIDYN                                              &
+     &          ,start_hour,irr_rate, irr_fra                         & !! for irrigation, byang
      &                                                             )
 
 #if ( ! NMM_CORE == 1 )
@@ -1382,6 +1383,14 @@ CONTAINS
    INTEGER                                             ::   spp_lsm_loc
 
    real,    optional,  dimension(ims:ime,jms:jme ),intent(inout) :: XLAIDYN
+
+!------------------------for irrigation, byang
+  integer, intent(IN) :: start_hour
+  REAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: irr_rate
+  REAL, DIMENSION( ims:ime, jms:jme ), INTENT(IN   ) :: irr_fra
+!--------------------------------------
+   
+   
 !
 !------------------------------------------------------------------
 ! Initialize local variables
@@ -2797,7 +2806,9 @@ CONTAINS
 !
 !  END FASDAS
 !
-                ,RS,XLAIDYN)
+                ,RS,XLAIDYN                                     &
+                ,xtime,start_hour,irr_rate,irr_fra               & !! for irrigation, byang
+                )
          ENDIF
 
          call seaice_noah( SEAICE_ALBEDO_OPT, SEAICE_ALBEDO_DEFAULT, SEAICE_THICKNESS_OPT, &

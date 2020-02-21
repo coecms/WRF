@@ -426,7 +426,8 @@ BENCH_START(rad_driver_tim)
      &         ,MP_PHYSICS=CONFIG_FLAGS%MP_PHYSICS        &
      &         ,EFCG=grid%EFCG,EFCS=grid%EFCS,EFIG=grid%EFIG &
      &         ,EFIS=grid%EFIS,EFSG=grid%EFSG,aercu_opt=config_flags%aercu_opt & 
-     &         ,EFSS=grid%EFSS,QS_CU=grid%QS_CU)
+     &         ,EFSS=grid%EFSS,QS_CU=grid%QS_CU                   &
+     &                                                              )
 
 BENCH_END(rad_driver_tim)
 
@@ -884,6 +885,8 @@ BENCH_START(surf_driver_tim)
      &        ,spp_lsm=config_flags%spp_lsm,pattern_spp_lsm=grid%pattern_spp_lsm     & !SPP
      &        ,field_sf=grid%field_sf                                                & !SPP
      &        ,spp_pbl=config_flags%spp_pbl,pattern_spp_pbl=grid%pattern_spp_pbl     & !SPP
+     &        ,start_hour=grid%start_hour       &     !! for irrigation, byang
+     &         ,irr_rate=grid%IRR_RATE,irr_fra=grid%IRR_FRA       &     !! for irrigation, byang
      &                                                           )
 
 #ifdef WRF_HYDRO

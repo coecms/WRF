@@ -105,7 +105,8 @@ CONTAINS
                   dl_u_bep,sf_bep,vl_bep,sfcheadrt,INFXSRT, soldrain      &   !O multi-layer urban         
                  ,SDA_HFX, SDA_QFX, HFX_BOTH, QFX_BOTH, QNORM, fasdas     &   !fasdas
                  ,RC2,XLAI2                                               &
-                  )
+                 ,xtime,start_hour,irr_rate,irr_fra               &           !for irrigation, byang
+                 )
 
 !----------------------------------------------------------------
     IMPLICIT NONE
@@ -389,6 +390,27 @@ CONTAINS
 ! ----------------------------------------------------------------------
 ! DECLARATIONS - REAL
 ! ----------------------------------------------------------------------
+
+! ----------------------------------------------
+! irrigation variables, byang
+! ----------------------------
+
+
+      integer :: chhr       ! Local time - model time [hours]
+      integer :: lhr        ! Local hour
+      real :: ltime         ! Local time [hours]
+      integer, intent(IN) :: start_hour
+      real, intent(IN)    :: XTIME ! xtime is total minites since model start
+
+      real :: ir_SMCMAX      ! MAX SOIL MOISTURE CONTENT (POROSITY)
+      real :: ir_PSISAT      ! SATURATED SOIL POTENTIAL
+      real :: ir_DKSAT       ! SATURATED SOIL DIFFUSIVITY
+      real :: ir_BEXP        ! THE 'B' PARAMETER
+      real :: ir_rate, ir_fra
+      REAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) :: irr_rate
+      REAL, DIMENSION( ims:ime, jms:jme ), INTENT(IN   ) :: irr_fra
+
+!------------------------
 
       REAL  :: SHMIN,SHMAX,DQSDT2,LWDN,PRCP,PRCPRAIN,                    &
                Q2SAT,Q2SATI,SFCPRS,SFCSPD,SFCTMP,SHDFAC,SNOALB1,         &
@@ -1028,6 +1050,56 @@ CONTAINS
 !
 !  END FASDAS
 !
+!------------------------------
+!irrigation part, byang
+!------------------------------
+
+
+!calculating the local time
+  chhr = int(24.0 * XLONG(i,j)/360.0)
+  if ((XLONG(i,j) .lt. 0.0) .and.  &
+     (abs(real(mod(int(XLONG(i,j)),15))) .ge. 0.0001)) &
+     chhr = chhr - 1
+
+  lhr = mod(start_hour + int(XTIME/60.0)+ chhr,24)
+  ltime = real(lhr) + real(mod(int(XTIME),60))/60.0
+
+!calculate the irrigation over crop. 
+ if(IVGTYP(i,j).ge.2 .and. IVGTYP(i,j).le.6)then !! Attention: crop types may change if different landuse data is used, byang
+  !calculation on 6am
+  if(ltime.eq.6.0)then  !!Attention: be caution about the time step here, make sure the irrigation scheme will be triggered, byang
+
+   ir_SMCMAX=MAXSMC(soiltyp)
+   ir_PSISAT=SATPSI(soiltyp)
+   ir_DKSAT=SATDK(soiltyp)
+   ir_BEXP=BB(soiltyp)
+!   ir_SMCMAX=0.476
+!   ir_PSISAT=0.759
+!   ir_DKSAT=2.8E-6
+!   ir_BEXP=5
+
+   ir_fra=irr_fra(i,j)/100
+
+   CALL NOAH_IRR5 (SMC,ir_SMCMAX,ir_PSISAT,ir_DKSAT,ir_BEXP,  &
+                   VEGTYP,SOILTYP,SHDFAC,SHMIN,SHMAX,&
+                   ir_rate,ir_fra)
+   irr_rate(i,j)=ir_rate
+  end if
+
+!stop the irrigation during non-irrigation time
+  if ((ltime .lt. 6.0) .or. (ltime .ge. 10.0)) then
+   irr_rate(i,j)=0.0
+  end if
+
+!update the precipitation over crop
+
+  prcp=prcp+irr_rate(i,j)
+ end if
+
+!------------------------
+!end of irrigation part
+!------------------------
+
        CALL SFLX (I,J,FFROZP, ISURBAN, DT,ZLVL,NSOIL,SLDPTH,       &    !C
                  LOCAL,                                            &    !L
                  LUTYPE, SLTYPE,                                   &    !CL
@@ -5102,5 +5174,210 @@ SUBROUTINE lsm_mosaic(DZ8W,QV3D,P8W3D,T3D,TSK,                      &
 !--------------------------------      
   END SUBROUTINE lsm_mosaic_init  
 !--------------------------------  
+
+
+!irrigation subroutine, byang
+!=======================================================================
+! noah_irr5.F90
+!
+! DESCRIPTION:
+! TILE_SPECIFIC irrigation 
+! Calculate water requirement and apply the amount to precipitation.
+!
+! Irrigate when root zone soil moisture falls below 50 % of 
+! the field capacity (reference soil moiture) at 6 am LST.  
+! The root zone is actual maximum root depth rather than NOAH root zone.
+! Method of irrigation is by precipitation between 6-10 am LST.
+!
+! Irrigation amount is scaled to grid total crop fraction when intensity
+! is less than the fraction.  Irrigation is expanded to non-crop, non-forest,
+! non-baresoil/urban tiles if intensity exceeds grid total crop fraction.
+! In latter case, scaled irrigation is applied to grassland first, 
+! then further applied over the rest of tiles equally if the intensity 
+! exceeds grassland fraction as well.   
+!
+! Optionally efficiency correction is applied to account for field loss. 
+!
+! Optionally outputs amount of water put into the system to a text file. 
+!
+! This version includes modifications to irr4 as follows:
+! 1) Use location specific growing season threshold (40% of GFRAC range)
+! 2) Allow irrigation in non-crop/non-forest tiles when irrigation 
+!    intensity exceeds total crop fraction
+!
+! REVISION HISTORY:
+!
+! Aug 2008: Hiroko Kato; Initial code
+! 
+!=======================================================================
+
+
+  SUBROUTINE NOAH_IRR5(SMC,SMCMAX,PSISAT,DKSAT,BEXP,  &
+                       VEGT,SOILTYP,SHDFAC,SHDMIN,SHDMAX,&
+                       irr_rate,irr_fra)
+
+  implicit none
+!=== Local Variables ===================================================
+
+! Option 4: apply uniform duration from 6 to 10 am
+  real, parameter :: irrhr = 4.   ! duration of irrigation hours 
+  real, parameter :: threshold = 0.5 ! trigger threshold [fraction]
+  real, parameter :: efcor = 0.0      ! Efficiency Correction (%)
+  real :: ASMC        ! Total soil moisture in current root depth
+  real :: TSMCWLT     ! wilting point in current root depth
+  real :: TSMCREF     ! field capacity in current root depth
+  real :: MA          ! moisture availability [volumetoric]
+  integer :: vegt
+  integer :: k        ! soil layer number
+  integer :: j        ! veg time index
+  character(len=1)             :: flag  ! irrigated yes=Y, no=N
+  real :: rootd ! actual root depth
+  real :: gsthresh    ! growing season threshold [fraction]
+!-- NOAH variables used in noah_main
+
+  integer,parameter :: NSOIL  =  4   ! 4 soil layers in NOAH
+  real,dimension(NSOIL) :: SLDPTH    ! soil thickness [m]
+  real,dimension(NSOIL) :: RDPTH     ! root length [m]
+  real,dimension(NSOIL) :: ZDPTH     ! soil depth [m]
+  real,dimension(NSOIL) :: water     ! amount of water [mm]
+  real,dimension(NSOIL) :: SMC
+  real :: twater                     ! total amount of water in root zone [mm]
+  real :: twater1     ! twater before scaling for eff corr
+  real :: twater2     ! twater after scaling for eff corr
+  real :: crootd      ! current root depth [m]
+  real :: SMCMAX      ! MAX SOIL MOISTURE CONTENT (POROSITY)
+  real :: SMCREF      ! REFERENCE SOIL MOISTURE (ONSET OF SOIL MOISTURE
+  real :: SMCWLT      ! Wilting point STRESS IN TRANSPIRATION) - Volumetric
+  real :: PSISAT      ! SATURATED SOIL POTENTIAL
+  real :: DKSAT       ! SATURATED SOIL DIFFUSIVITY
+  real :: BEXP        ! THE 'B' PARAMETER
+  real :: SMHIGH      ! Soil moisture reference parameter
+  real :: SMLOW       ! Soil moisture wilt parameter
+  integer :: NROOT    ! Number of root layers, dep. on veg. type
+  integer :: LROOT    ! Number of root layers, based on current root depth
+  integer :: SOILTYP  ! Soil type (integer index)
+  real :: SMCREF1,SMCWLT1
+  real :: SHDFAC,SHDMIN,SHDMAX      ! greeness fraction
+  real :: irr_rate,irr_fra
+
+!=== End Variable Definition ===========================================
+
+! Read in maximum Root Depth [m] for each crop type
+!=============================main tile loop=========================
+! Initialize 
+   flag = "N"
+   twater = 0.0
+   water = 0.0
+   ASMC = 0.0
+   TSMCWLT = 0.0
+   TSMCREF = 0.0
+   MA = 0.0
+   crootd = 0.0
+   LROOT = 0
+   irr_rate=0.0
+
+! Set NOAH static variables
+      NROOT = 4
+      rootd=1.0 !Attention, I just use 1 m for all the crops, byang
+
+      SLDPTH(1) = 0.1         ! Soil layer thicknesses (m)
+      SLDPTH(2) = 0.3
+      SLDPTH(3) = 0.6
+      SLDPTH(4) = 1.0
+      ZDPTH(1) = SLDPTH(1)         ! Soil layer depth from top (m)
+      ZDPTH(2) = SLDPTH(1) + SLDPTH(2)
+      ZDPTH(3) = SLDPTH(1) + SLDPTH(2) + SLDPTH(3)
+      ZDPTH(4) = SLDPTH(1) + SLDPTH(2) + SLDPTH(3) + SLDPTH(4)
+      SMLOW = 0.5
+      SMHIGH = 6.0
+      SMCREF1 = SMCMAX*(5.79E-9/DKSAT)**(1.0/(2.0*BEXP+3.0))
+      SMCREF = SMCREF1 + (SMCMAX-SMCREF1) / SMHIGH
+      SMCWLT1 = SMCMAX * (200.0/PSISAT)**(-1.0/BEXP)
+      SMCWLT = SMCWLT1 - SMLOW * SMCWLT1
+
+! Determine local time and previous, current, and next model times.
+!*** Set the irrigation rate at 6 am; keep the value till next day
+!    If local time at the tile fall in the irrigation check
+!    hour then check the root zone average soil moisture
+ ! Proceed if it is non-forest, non-baresoil/urban
+!     Determine the amount of irrigation to apply if irrigated tile
+      if (irr_fra .gt. 0.0) then  ! irrigated tile
+
+!     Check if it is in growing season
+!     growing season threshold = gfmin + 0.40*(gfmax - gfmin)
+      gsthresh = SHDMIN + 0.40 * (SHDMAX-SHDMIN)
+
+     if (SHDFAC >= gsthresh) then
+
+!     Adjust current root depth [m] based on the greeness fraction
+      crootd = rootd*SHDFAC
+
+!     Determine soil depth according to the current root depth
+      RDPTH = 0.0
+      if ( crootd .lt. ZDPTH(1) ) then
+          LROOT = 1
+          RDPTH(1) = crootd
+      elseif ( crootd .ge. ZDPTH(1) .and. crootd .lt. ZDPTH(2) ) then
+          LROOT = 2
+          RDPTH(1) = SLDPTH(1)
+          RDPTH(2) = crootd - ZDPTH(1)
+      elseif ( crootd .ge. ZDPTH(2) .and. crootd .lt. ZDPTH(3) ) then
+          LROOT = 3
+          RDPTH(1) = SLDPTH(1)
+          RDPTH(2) = SLDPTH(2)
+          RDPTH(3) = crootd - ZDPTH(2)
+      elseif ( crootd .ge. ZDPTH(3) .and. crootd .lt. ZDPTH(4) ) then
+          LROOT = 4
+          RDPTH(1) = SLDPTH(1)
+
+          RDPTH(2) = SLDPTH(2)
+          RDPTH(3) = SLDPTH(3)
+          RDPTH(4) = crootd - ZDPTH(3)
+      else
+         print*,'error getting root depth'
+      endif
+
+!     Compute the root zone accumlative soil moisture [mm],
+!     field capacity [mm], and wilting point [mm]
+       DO K = 1, LROOT
+        ASMC = ASMC + SMC(K)*RDPTH(K)*1000.
+        TSMCWLT = TSMCWLT + SMCWLT*RDPTH(K)*1000.
+        TSMCREF = TSMCREF + SMCREF*RDPTH(K)*1000.
+       END DO
+
+!     Get the root zone moisture availability to the plant
+       MA = (ASMC - TSMCWLT) / (TSMCREF - TSMCWLT)
+
+       if ( MA <=  threshold ) then !below threshold
+        flag = "Y"
+!     Compute the amount of water to be added [mm]
+       DO K = 1, LROOT
+         water(K) = (SMCREF - SMC(K))*RDPTH(K)*1000.
+         twater = twater + water(K)
+       ENDDO
+
+!     Scale the irrigation intensity to the crop % when intensity < crop%.
+!     Expand irrigation for non-crop, non-forest when intensity > crop %
+!     in preference order of grassland first then rest.
+!     *scale is pre-computed for each tile in getirrpmapetc module in a way
+!     that is transparent to every tile irrigated or non-irrigated
+         twater1 = twater
+         twater = twater * IRR_FRA
+ !      Apply efficiency correction
+       twater2 = twater
+       twater = twater * ( 100.0 / (100.0 - efcor))
+
+!***  Compute the irrigation rate to be added to precipitation (option 4)
+       irr_rate = twater/(irrhr*3600.)
+
+       endif ! below threshold
+
+      endif ! growing season
+
+    end if
+!=============================end main tile loop=========================
+  return
+  end subroutine NOAH_IRR5
+
 
 END MODULE module_sf_noahdrv
