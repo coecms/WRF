@@ -114,6 +114,10 @@ lrwxrwxrwx 1 abc123 wrf 21 Aug 23 10:20 ungrib.exe -> ungrib/src/ungrib.exe
 ```
 Note that there are some warnings in the build output like "warning: overriding commands for target '.c.o'." These are harmless and can be ignored.
 
+The January 2000 tutorial case
+===================================
+For **WRF v4.1 and newer versions**, you will need to use the WPS/ungrib/Variable_Tables/Vtable.GFS.tutorial and **not** WPS/ungrib/Variable_Tables/Vtable.GFS for ungrib.exe. This is because the GFS files have changed in newer versions of GFS and the Vtable.GFS file is suitable for newer versions of GFS, not the ones from 2000. Please see notes in the Vtable file for more information.
+
 Tests run
 =========
 ## Compilation
