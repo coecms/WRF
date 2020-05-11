@@ -19,6 +19,7 @@ where version is the WRF version you want to use.
 
 Versions currently available:
 =============================
+* V4.2
 * V4.1.3
 * V4.1.2
 * V4.1.1
