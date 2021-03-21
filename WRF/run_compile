@@ -60,9 +60,14 @@ if [[ ${help_text} == 1 ]]; then
     echo "        sm+dm   shared and distributed memory parallelisation"
     
     echo "    The architecture choices are:"
-    echo "        76-79    best precision (76=serial, 77=smpar, 78=dmpar, 79=sm+dm)"
-    echo "        72-75    optimisation for Sandy Bridge processors (express/normal queues)"
-    echo "               (72=serial, 73=smpar, 74=dmpar, 75=sm+dm)"
+    echo "        76-79    less optimisations for Cascade Lake and Broadwell processors (-O2)"
+    echo "                  (express/normal, expressbw/normalbw queues)"
+    echo "                  (76=serial, 77=smpar, 78=dmpar, 79=sm+dm)"
+    echo "        72-75    optimisation for Cascade Lake and Broadwell processors (-O3)"
+    echo "                  (express/normal, expressbw/normalbw queues)"
+    echo "                  (72=serial, 73=smpar, 74=dmpar, 75=sm+dm)"
+    echo "        13-16    Intel compiler, least optimisations, slow code (no -xHOST)"
+    echo "                  (13=serial, 14=smpar, 15=dmpar, 16=sm+dm)"
     echo 
 
     # Nest
