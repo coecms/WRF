@@ -19,6 +19,7 @@ where version is the WRF version you want to use.
 
 Versions currently available:
 =============================
+* V4.2.2
 * V4.2.1
 * V4.2
 * V4.1.3
@@ -37,7 +38,14 @@ Go to the WRFV3/ subdirectory, run:
 ```
 cd WRF/WRFV3/
 ```
-There is a *run_compile* script to help you configure and compile WRF. This script by default will compile the WRFV3 software for a real experiment, with some speed optimisations for the normal and express queues and with basic nesting. There is a range of command-line arguments accepted by the script. These are the command-line arguments accepted by the *configure* script, an option to clean everything prior to compilation, the choice of compilation flags and nesting type for the *configure* script and finally the compilation option for the *compile* script. You can access a full list and description by running:
+There is a *run_compile* script to help you configure and compile WRF. This script by default will compile the WRFV3 software for a real experiment, with some speed optimisations for the normal, express. normalbw and expressbw queues and with basic nesting. There is a range of command-line arguments accepted by the script. These are:
+* the command-line arguments accepted by the *configure* script
+* an option to clean everything prior to compilation
+* the choice of compilation flags
+* the choice of nesting type for the *configure* script
+* the compilation option for the *compile* script. 
+
+You can access a full list and description by running:
 ```
 ./run_compile -h
 ```
@@ -47,7 +55,7 @@ To configure and compile WRFV3 with the default options, you simply run:
 ```
 If you want more aggressive optimisation options on Cascade Lake nodes, please refer to the help of run_compile for the version you are using.
 
-The configure step will be run interactively with the output on your screen, then the compilation step will be submitted to the express queue automatically.
+The configure step will run interactively with the output on your screen, then the compilation step will be submitted to the express queue automatically.
 
 After a successful build, one should see the following executable files for WRF (the ARW core):
 ```
@@ -123,7 +131,6 @@ For **WRF v4.1 and newer versions**, you will need to use the WPS/ungrib/Variabl
 Tests run
 =========
 ## Compilation
-* WRF compilation with dmpar
 * WRF compilation with dm+sm
 * WPS compilation with distributed memory with dm+sm compilation of WRF
 ## Tests simulations
@@ -134,4 +141,3 @@ Tests simulations have been done on [Jenkins](https://accessdev.nci.org.au/jenki
 * First tutorial case (Jan 00) with quiting I/O.
 * First tutorial case (Jan 00) with restart
 WRF outputs for these tests can be found under /projects/WRF/data/KGO/. The inputs for the tests can be found in https://github.com/coecms/wrf-testing
-Note: wps-era is currently being tested for WRF v4.1.1 compatibility to create boundary conditions from ERA-Interim.
