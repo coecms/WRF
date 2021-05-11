@@ -20,8 +20,8 @@ fi
 source ${WRF_ROOT}/build.env
 ulimit -s unlimited
 
-if [ -x "${WRF_ROOT}/WRFV3/main/wrf.exe" ]; then
-    export PATH="${WRF_ROOT}/WRFV3/main:${PATH}"
+if [ -x "${WRF_ROOT}/WRF/main/wrf.exe" ]; then
+    export PATH="${WRF_ROOT}/WRF/main:${PATH}"
 else
     echo "ERROR: WRF not found"
     exit 1

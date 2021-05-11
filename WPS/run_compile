@@ -101,8 +101,8 @@ fi
 qsub $test -N compile_wps <<EOF_compile
 #PBS -l walltime=1800
 #PBS -l mem=2GB
-#PBS -l ncpus=1
-#PBS -q express
+#PBS -l ncpus=2
+#PBS -q normal
 #PBS -l wd
 #PBS -j oe
 #PBS -l software=intel-compiler
@@ -110,6 +110,9 @@ qsub $test -N compile_wps <<EOF_compile
 #PBS -l storage=gdata/$PROJECT+scratch/$PROJECT$proj
 
 source ../build.env
+
+# For multi-processors compilation
+export J="-j \$PBS_NCPUS"
 
 ./compile
 ./compile plotfmt
