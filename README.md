@@ -19,6 +19,7 @@ where version is the WRF version you want to use.
 
 Versions currently available:
 =============================
+* V4.3  (with updated WPS)
 * V4.2.2
 * V4.2.1
 * V4.2
@@ -124,6 +125,10 @@ lrwxrwxrwx 1 abc123 wrf 21 Aug 23 10:20 ungrib.exe -> ungrib/src/ungrib.exe
 ```
 Note that there are some warnings in the build output like "warning: overriding commands for target '.c.o'." These are harmless and can be ignored.
 
+The October 2016 tutorial case
+===================================
+The data for the October 2016 WRF tutorial case  can now be found under /g/data/sx70/data/SingleDomain_data/matthew.
+
 The January 2000 tutorial case
 ===================================
 For **WRF v4.1 and newer versions**, you will need to use the WPS/ungrib/Variable_Tables/Vtable.GFS.tutorial and **not** WPS/ungrib/Variable_Tables/Vtable.GFS for ungrib.exe. This is because the GFS files have changed in newer versions of GFS and the Vtable.GFS file is suitable for newer versions of GFS, not the ones from 2000. Please see notes in the Vtable file for more information.
@@ -134,10 +139,17 @@ Tests run
 * WRF compilation with dm+sm
 * WPS compilation with distributed memory with dm+sm compilation of WRF
 ## Tests simulations
-Tests simulations have been done on [Jenkins](https://accessdev.nci.org.au/jenkins/job/WRF/job/WRF-Core/). The simulations were:
+Tests simulations have been done on [Jenkins](https://accessdev.nci.org.au/jenkins/job/WRF/job/WRF-Core/). The tests were updated from version 4.3. From version 4.3, the tests were:
+* First tutorial case (Oct 16) with 1 nest
+* First tutorial case (Oct 16) with 2 nests
+* First tutorial case (Oct 16) with additional diagnostics turned on
+* First tutorial case (Oct 16) with restart
+
+For previous versions, the simulations were:
 * First tutorial case (Jan 00) with 1 nest
 * First tutorial case (Jan 00) with 2 nests
 * First tutorial case (Jan 00) with additional diagnostics turned on.
 * First tutorial case (Jan 00) with quiting I/O.
 * First tutorial case (Jan 00) with restart
-WRF outputs for these tests can be found under /projects/WRF/data/KGO/. The inputs for the tests can be found in https://github.com/coecms/wrf-testing
+  
+WRF outputs for these tests can be found under /g/data/sx70/data/KGO/. The inputs for the tests can be found in https://github.com/coecms/wrf-testing
