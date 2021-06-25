@@ -6,7 +6,7 @@
 #PBS -q express
 #PBS -l wd
 #PBS -W umask=0022
-#PBS -l storage=scratch/$PROJECT+gdata/$PROJECT
+#PBS -l storage=scratch/w35+gdata/w35
 
 # ------- USER UPDATE NECESSARY
 # To allow running on /scratch with the source code on /home or /g/data

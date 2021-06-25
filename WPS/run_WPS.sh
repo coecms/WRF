@@ -7,7 +7,7 @@
 #PBS -l ncpus=4
 #PBS -l mem=4gb
 #PBS -l wd
-#PBS -l storage=scratch/$PROJECT+gdata/$PROJECT+gdata/sx70
+#PBS -l storage=scratch/w35+gdata/w35+gdata/sx70
 #PBS -W umask=0022
 
 set -eu
