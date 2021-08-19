@@ -407,5 +407,456 @@ varstd=varstd+var*var
 
 END SUBROUTINE varstatistics
 
+SUBROUTINE diagnostic_clwrf_clim_new(                 &
+  ids,ide, jds,jde, kds,kde                        &
+  ,ims,ime, jms,jme, kms,kme                       &
+  ,ips,ipe, jps,jpe, kps,kpe                       &
+  ,i_start,i_end,j_start,j_end,num_tiles           &
+  ,kts,kte                                         &
+  ,max_window                                      &
+  ,raincv,rainncv                                  &
+  ,u10,v10                                         &
+  ,swdown                                          &
+  ,histout, histstart_h, histstart_m               &
+  ,histstart_s, histstart                          &
+  ,do_rain5, prmax5, tprmax5                       &
+  ,do_rain10, prmax10, tprmax10                    &
+  ,do_rain20, prmax20, tprmax20                    &
+  ,do_rain30, prmax30, tprmax30                    &
+  ,do_rain60, prmax60, tprmax60                    &
+  ,do_wind5, uv10max5, tuv10max5                   &
+  ,do_wind10, uv10max10, tuv10max10                &
+  ,do_wind20, uv10max20, tuv10max20                &
+  ,do_wind30, uv10max30, tuv10max30                &
+  ,do_wind60, uv10max60, tuv10max60                &
+  ,track_rain, track_wind, track_dt                &
+  ,dsunshine, initime_sunshine                     &
+  ,is_restart                                      &
+  ,dt,xtime                                        &
+  )
+!----------------------------------------------------------------------
+
+USE module_dm, ONLY: wrf_dm_sum_real, wrf_dm_maxval
+
+IMPLICIT NONE
+!======================================================================
+! Definitions
+!-----------
+!-- DT            time step (second)
+!-- XTIME         forecast time
+!
+!-- RAINCV        cumulus scheme precipitation in one time step (mm)
+!-- RAINNCV       explicit scheme precipitation in one time step (mm)
+!-- TRACK_RAIN    records rain over max_window time-steps so we can calculate
+!                 the moving averages.
+!-- TRACK_WIND    records wind speeds over max_window time-steps to calculate
+!                 the moving averages.
+!-- TRACK_DT      records the time-step lengths in case of varying
+!                 time-step.
+!
+!-- ims           start index for i in memory
+!-- ime           end index for i in memory
+!-- jms           start index for j in memory
+!-- jme           end index for j in memory
+!-- i_start       start indices for i in tile
+!-- i_end         end indices for i in tile
+!-- j_start       start indices for j in tile
+!-- j_end         end indices for j in tile
+!-- num_tiles     number of tiles
+!
+!======================================================================
+! is_restart: whether if simulation is a restart
+
+! Number of time windows 
+INTEGER, PARAMETER :: ndiag=5
+! Time windows in minutes
+INTEGER, DIMENSION( ndiag ), PARAMETER :: time_diag=(/5,10,20,30,60/)
+
+INTEGER, INTENT(IN)                                 :: ims,ime, jms,jme, kms,kme  &
+                                                      ,ids,ide, jds,jde, kds,kde  &
+                                                      ,ips,ipe, jps,jpe, kps,kpe  &
+                                                      ,kts,kte                    &
+                                                      ,num_tiles, max_window
+
+INTEGER, DIMENSION(num_tiles), INTENT(IN)             :: i_start,i_end,j_start,j_end 
+
+REAL,  INTENT(IN)                                     :: DT, XTIME
+
+INTEGER, INTENT(IN)                                   :: histout
+INTEGER, INTENT(IN)                                   :: histstart_h &
+      ,histstart_m &
+                                                      ,histstart_s &
+                                                      ,histstart
+REAL, DIMENSION( ims:ime , jms:jme ), INTENT(IN) :: raincv, rainncv, swdown
+REAL, DIMENSION( ims:ime , jms:jme ), INTENT(IN) :: u10, v10
+
+INTEGER, TARGET, INTENT(IN)                      :: do_rain5, do_rain10  &
+                                                    ,do_rain20, do_rain30 &
+                                                    ,do_rain60
+
+REAL, DIMENSION( ims:ime , jms:jme ), TARGET, INTENT(INOUT) :: prmax5 , tprmax5  &
+                                                      ,prmax10, tprmax10 &
+                                                      ,prmax20, tprmax20 &
+                                                      ,prmax30, tprmax30 &
+                                                      ,prmax60, tprmax60 
+
+REAL, DIMENSION( ims:ime,1:max_window,jms:jme ), INTENT(INOUT) :: track_rain
+
+INTEGER, TARGET, INTENT(IN)                      :: do_wind5, do_wind10  &
+                                                    ,do_wind20, do_wind30 &
+                                                    ,do_wind60
+
+REAL, DIMENSION( ims:ime , jms:jme ), TARGET, INTENT(INOUT) :: uv10max5 , tuv10max5  &
+                                                      ,uv10max10, tuv10max10 &
+                                                      ,uv10max20, tuv10max20 &
+                                                      ,uv10max30, tuv10max30 &
+                                                      ,uv10max60, tuv10max60 
+
+REAL, DIMENSION( ims:ime,1:max_window,jms:jme ), INTENT(INOUT) :: track_wind
+REAL, DIMENSION( 1:max_window ), INTENT(INOUT) :: track_dt
+
+      
+REAL, DIMENSION( ims:ime , jms:jme ), INTENT(INOUT) :: dsunshine, initime_sunshine
+LOGICAL, INTENT(IN)                                   :: is_restart
+
+! LOCAL  VAR
+TYPE IND_DIAG
+    INTEGER, POINTER :: do_diag
+    REAL, POINTER, DIMENSION(:,:) :: maxivalue
+    REAL, POINTER, DIMENSION(:,:) :: maxtime
+END TYPE IND_DIAG
+
+TYPE(IND_DIAG), DIMENSION( ndiag )                    :: do_rain_diag
+TYPE(IND_DIAG), DIMENSION( ndiag )                    :: do_wind_diag
+
+
+INTEGER                                               :: i,j,ij,im2,jm2,n
+INTEGER                                               :: istart, iend, jstart, jend
+
+INTEGER                                               :: histstart_mloc
+
+INTEGER            :: ndt_rain_max
+INTEGER            :: ndt_wind_max
+
+REAL, DIMENSION(5) :: per_rain
+REAL, DIMENSION(5) :: per_wind
+REAL               :: per_rain_max
+REAL               :: per_wind_max
+
+REAL               :: begin_time
+REAL               :: first_out, time_since_last_out
+REAL, SAVE         :: XTIME0
+
+REAL, PARAMETER                                       :: sunshine_start=120.
+REAL, DIMENSION( ims:ime , jms:jme )                  :: total
+REAL                                                  :: tmp
+
+CHARACTER(LEN=1024)                                   :: outstring
+
+LOGICAL, SAVE                                         :: FIRST=.TRUE.
+LOGICAL                                               :: is_reset
+LOGICAL, EXTERNAL                                     :: wrf_dm_on_monitor
+
+!-----------------------------------------------------------------
+
+! Transform individual variables in arrays to make code easier to maintain
+! Allocate pointers
+do_rain_diag(1)%do_diag => do_rain5
+do_rain_diag(2)%do_diag => do_rain10
+do_rain_diag(3)%do_diag => do_rain20
+do_rain_diag(4)%do_diag => do_rain30
+do_rain_diag(5)%do_diag => do_rain60
+
+do_rain_diag(1)%maxivalue => prmax5
+do_rain_diag(2)%maxivalue => prmax10
+do_rain_diag(3)%maxivalue => prmax20
+do_rain_diag(4)%maxivalue => prmax30
+do_rain_diag(5)%maxivalue => prmax60
+
+do_rain_diag(1)%maxtime => tprmax5
+do_rain_diag(2)%maxtime => tprmax10
+do_rain_diag(3)%maxtime => tprmax20
+do_rain_diag(4)%maxtime => tprmax30
+do_rain_diag(5)%maxtime => tprmax60
+
+
+do_wind_diag(1)%do_diag => do_wind5
+do_wind_diag(2)%do_diag => do_wind10
+do_wind_diag(3)%do_diag => do_wind20
+do_wind_diag(4)%do_diag => do_wind30
+do_wind_diag(5)%do_diag => do_wind60
+
+do_wind_diag(1)%maxivalue => uv10max5
+do_wind_diag(2)%maxivalue => uv10max10
+do_wind_diag(3)%maxivalue => uv10max20
+do_wind_diag(4)%maxivalue => uv10max30
+do_wind_diag(5)%maxivalue => uv10max60
+
+do_wind_diag(1)%maxtime => tuv10max5
+do_wind_diag(2)%maxtime => tuv10max10
+do_wind_diag(3)%maxtime => tuv10max20
+do_wind_diag(4)%maxtime => tuv10max30
+do_wind_diag(5)%maxtime => tuv10max60
+
+
+
+! For printing purposes only
+im2=INT(ims+(ime-ims)/2)
+jm2=INT(jms+(jme-jms)/2)
+
+! Get the maximum period for rain and wind diagnostics.
+IF (FIRST) THEN
+    XTIME0 = XTIME
+    FIRST  = .FALSE.
+ENDIF
+
+! Gives 0 if the diagnostic is not on for this nest. Else gives the time in seconds.
+do n=1,ndiag
+    per_rain(n) = time_diag(n)*do_rain_diag(n)%do_diag*60.
+    per_wind(n) = time_diag(n)*do_wind_diag(n)%do_diag*60.
+end do
+! Get the longer time period for this nest and the corresponding max number of 
+! time steps we need to keep for the diagnostic
+per_rain_max = MAXVAL(per_rain)
+ndt_rain_max = CEILING(per_rain_max/dt)
+
+per_wind_max = MAXVAL(per_wind)
+ndt_wind_max = CEILING(per_wind_max/dt)
+
+! Check if max_window is big enough
+IF (max_window < MAX(ndt_rain_max,ndt_wind_max)) THEN
+    WRITE(outstring,*) 'max_window is too small. It should be ', &
+        MAX(ndt_rain_max,ndt_wind_max)
+    CALL wrf_error_fatal(outstring)
+ENDIF
+
+! Calculate the first time step we want the diagnostics output. 
+! If the diagnostics are on only after some simulation time, we might
+! not need to start calculating the diagnostic from the start.
+begin_time = 0.
+histstart_mloc = histstart_m
+if (histstart_mloc == 0.) then
+    histstart_mloc = histstart
+end if
+begin_time = ((histstart_h*60. + histstart_mloc)*60. + histstart_s)
+
+first_out = XTIME0*60. + begin_time
+
+    
+! Reset the max and time of max at the time step after writing to file.
+! The namelist options auxhist5_interval and auxhist5_begin_h are used 
+! to define the output frequency of this diagnostic.
+tmp = XTIME*60.
+is_reset = (MOD(NINT(tmp-first_out), NINT(histout*60.)) == 0) .OR. (XTIME==0.)
+
+time_since_last_out = MOD((tmp-first_out),(histout*60.))/60.
+
+! Only calculate diagnostic after first_out - histout time
+IF (tmp >= (first_out - (histout*60./dt))) THEN
+
+! SET START AND END POINTS FOR TILES
+!$OMP PARALLEL DO   &
+!$OMP PRIVATE ( ij )
+
+    DO ij = 1 , num_tiles
+      istart=i_start(ij)
+      iend=i_end(ij)
+      jstart=j_start(ij)
+      jend=j_end(ij)
+      
+      ! If at least one of the diagnostics is switched on, we update the
+      ! array to track the timestep. We do this in case the diagnostics
+      ! straddle a restart where the timestep was changed.
+      IF (ndt_rain_max >0. .or. ndt_wind_max >0.) THEN
+          track_dt = cshift(track_dt,1,1)
+          track_dt(max_window) = dt
+      END IF
+      
+      IF (ndt_rain_max > 0.) THEN
+          ! We want some rain diagnostics so we need to keep track
+          ! of precipitations. The precip. of the current time step is 
+          ! always in the last index of track_rain.
+          DO j=jstart,jend
+            DO i=istart,iend
+                track_rain(i,:,j) = cshift(track_rain(i,:,j),1,1)
+                track_rain(i,max_window,j) = raincv(i,j) + rainncv(i,j)
+            enddo
+          ENDDO
+          
+          ! Loop over diagnostics for rain
+          DO n=1,ndiag
+            IF (DO_RAIN_DIAG(n)%DO_DIAG == 1) THEN
+                CALL ACCUM_DRIVER(                 &
+                    xtime,time_since_last_out,dt  &
+                    ,do_rain_diag(n)%maxivalue       &
+                    ,do_rain_diag(n)%maxtime      &
+                    ,track_rain, track_dt         &
+                    ,per_rain(n), max_window      &
+                    ,is_reset                     &
+                    ,ims, ime, jms, jme           &
+                    ,istart, iend, jstart, jend   & 
+                    )
+            ENDIF
+          ENDDO
+      ENDIF
+      
+      IF (ndt_wind_max > 0.) THEN
+          ! We want some wind diagnostics so we need to keep track
+          ! of wind speeds. The wind speed of the current time step is 
+          ! always in the last index of track_wind.
+          DO j=jstart,jend
+            DO i=istart,iend
+                track_wind(i,:,j) = cshift(track_wind(i,:,j),1,1)
+                track_wind(i,max_window,j) = sqrt(u10(i,j)**2+v10(i,j)**2)*dt
+            enddo
+          ENDDO
+          
+          ! Loop over diagnostics for wind
+          DO n=1,ndiag
+            IF (DO_WIND_DIAG(n)%DO_DIAG == 1) THEN
+                CALL ACCUM_DRIVER(                 &
+                    xtime,time_since_last_out, dt &
+                    ,do_wind_diag(n)%maxivalue       &
+                    ,do_wind_diag(n)%maxtime      &
+                    ,track_wind, track_dt         &
+                    ,per_wind(n), max_window      &
+                    ,is_reset                     &
+                    ,ims, ime, jms, jme           &
+                    ,istart, iend, jstart, jend   & 
+                    )
+            ENDIF
+          ENDDO
+      ENDIF
+  
+      ! Calculate sunshine. Needs to be set to 0 at midnight.
+!       IF ((MOD(NINT((XTIME*60.+start_sec)/dt),NINT(histout*60./dt)) == 0 .AND. &
+!           (.NOT.is_restart)) .OR. XTIME == 0 ) THEN 
+      IF (is_reset) THEN 
+          DO j=jstart,jend
+            DO i=istart,iend
+                dsunshine(i,j) = 0.
+                initime_sunshine(i,j) = 0.                 
+            ENDDO
+          ENDDO
+      ENDIF
+      
+      DO j=jstart,jend
+          DO i=istart,iend
+            IF ((swdown(i,j) >= sunshine_start) .AND. (initime_sunshine(i,j) == 0.)) THEN
+                initime_sunshine(i,j)=time_since_last_out
+                dsunshine(i,j)=dt
+            ELSE IF ((swdown(i,j) >= sunshine_start)) THEN
+                dsunshine(i,j)=dsunshine(i,j)+dt
+            ENDIF
+          END DO
+      END DO
+    END DO
+END IF  ! To delay start of diagnostic.
+
+IF ( wrf_dm_on_monitor() ) THEN
+    WRITE(outstring,*) 'CLWRFclim values: ',ij,' dsunshine:', dsunshine(im2, jm2),      &
+        ' time sunshine:', initime_sunshine(im2, jm2)
+    CALL wrf_debug ( 75, TRIM(outstring) )
+END IF
+
+END SUBROUTINE diagnostic_clwrf_clim_new
+
+SUBROUTINE ACCUM_DRIVER(            &
+  xtime, time_since_last_out, dt &
+  ,maxper, tmaxper               &
+  ,track, track_dt               &
+  ,P_ask, nwind                  &
+  ,is_reset                      &
+  ,ims, ime, jms, jme            &
+  ,istart, iend, jstart, jend    &
+  )
+
+INTEGER, INTENT(IN)                                     :: ims,ime, jms,jme &
+      , nwind
+INTEGER, INTENT(IN)                                     :: istart, iend, jstart, jend
+REAL,  INTENT(IN)                                       :: DT, XTIME, time_since_last_out
+
+REAL, INTENT(IN)                                        :: P_ask
+REAL, DIMENSION( ims:ime,1:nwind, jms:jme ), INTENT(IN) :: track
+REAL, DIMENSION( 1:nwind ), INTENT(IN)                  :: track_dt
+LOGICAL, INTENT(IN)                                     :: is_reset
+REAL, DIMENSION( ims:ime , jms:jme ), INTENT(INOUT)     :: maxper, tmaxper
+
+INTEGER                                                 :: ndt
+REAL                                                    :: time_sum ! Cum. sum of time-steps
+                                                                    ! to find # of t.s. in P_ask.
+REAL, DIMENSION( ims:ime , jms:jme )                    :: rate
+REAL, DIMENSION( ims:ime,1:nwind, jms:jme )             :: loc_track
+
+INTEGER                                                 :: i,j
+
+LOGICAL, EXTERNAL                                       :: wrf_dm_on_monitor
+CHARACTER(LEN=1024)                                     :: outstring
+
+INTEGER                                                 :: im2, jm2
+REAL                                                    :: Fn, tmp
+
+IF (is_reset) THEN
+    ! Reset max and time to 0.
+    DO j=jstart,jend
+      DO i=istart,iend
+          maxper(i,j) = 0.
+          tmaxper(i,j) = 0.                      
+      ENDDO
+    ENDDO
+ENDIF
+
+IF (sum(track_dt) >= P_ask) THEN
+    im2=INT(ims+(ime-ims)/2)
+    jm2=INT(jms+(jme-jms)/2)
+
+
+    ! Get number of time steps in the accumulation window.
+    ! Sum the dt in track_dt from last until we reach time >= P_ask
+    ndt = 0
+    time_sum = track_dt(nwind)
+    do while ( time_sum < P_ask )
+      ndt = ndt + 1
+      time_sum = time_sum + track_dt(nwind - ndt)
+    end do
+    
+    
+    ! Fraction of time for the last time step <= 1
+    tmp = sum(track_dt(nwind-ndt:nwind-1))
+    Fn = (P_ask - tmp)/track_dt(nwind)    
+    
+    ! If we have a varying time-step then maybe we can have Fn <0,
+    ! when new time-step < old time-step. In this case, it means there
+    ! is nothing to be done at this time-step and we just need to 
+    ! exit the subroutine.
+    if (Fn > 0) then
+      ! Accumulate the precip. or wind over the ndt last time steps.
+      ! We should have: (ndt-1)+Fn = P_ask/dt.
+      loc_track = track/P_ask
+      rate = sum(loc_track(:,nwind-ndt:nwind-1,:),2)+loc_track(:,nwind,:)*Fn
+      
+      ! Find maximum.
+      DO j=jstart,jend
+          DO i=istart,iend
+            IF (rate(i,j) > maxper(i,j)) THEN
+                maxper(i,j)=rate(i,j)
+                tmaxper(i,j)=time_since_last_out+Fn*track_dt(nwind)/60.
+            END IF
+          END DO
+      END DO
+    
+!!!!!  !!!!!  !!!!!
+      ! Printing some results
+      !!
+      IF ( wrf_dm_on_monitor() ) THEN
+          WRITE(outstring,*) 'CLWRFclim values: maxper:', maxper(im2, jm2),      &
+              ' tmaxper:', tmaxper(im2, jm2), 'period:', P_ask
+          CALL wrf_debug ( 75, TRIM(outstring) )
+      END IF
+    end if
+ENDIF
+
+END SUBROUTINE ACCUM_DRIVER
+
 END MODULE module_diag_cl
 #endif

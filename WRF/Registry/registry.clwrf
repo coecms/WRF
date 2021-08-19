@@ -1,0 +1,55 @@
+# To allow output of mean rain and wind on different time windows.
+
+# table entries are of the form
+#<Table> <Type> <Sym>         <Dims>   <Use>   <NumTLev> <Stagger> <IO>     <DNAME>             <DESCRIP>     <UNITS>
+#
+
+rconfig  integer         max_window      namelist,diagnostics         1           1     
+rconfig  integer         max_rain_5m     namelist,diagnostics      max_domains    0     
+rconfig  integer         max_wind_5m     namelist,diagnostics      max_domains    0     
+rconfig  integer         max_rain_10m    namelist,diagnostics      max_domains    0     
+rconfig  integer         max_wind_10m    namelist,diagnostics      max_domains    0     
+rconfig  integer         max_rain_20m    namelist,diagnostics      max_domains    0     
+rconfig  integer         max_wind_20m    namelist,diagnostics      max_domains    0     
+rconfig  integer         max_rain_30m    namelist,diagnostics      max_domains    0     
+rconfig  integer         max_wind_30m    namelist,diagnostics      max_domains    0     
+rconfig  integer         max_rain_60m    namelist,diagnostics      max_domains    0     
+rconfig  integer         max_wind_60m    namelist,diagnostics      max_domains    0     
+
+state    real  SUNSHINE         ij      misc        1         -      rh7      "SUNSHINE"               "SUNSHINE LENGTH"                                                      "second"
+state    real  TSUNSHINE        ij      misc        1         -      rh7      "TSUNSHINE"              "TIME OF SUNSHINE"                                                     "minute"
+state    real  TRACK_RAIN       i{ndt}j misc        1         -      r        "TRACK_RAIN"              "TRACK RAIN FOR DIAGNOSTICS"                                       "m"
+state    real  TRACK_WIND       i{ndt}j misc        1         -      r        "TRACK_WIND"              "TRACK WIND SPEEDS FOR DIAGNOSTICS (in distance)"                  "m"
+state    real  TRACK_DT       {ndt}     misc        1         -      r        "TRACK_DT"              "TRACK TIME-STEPS FOR DIAGNOSTICS"                  "s"
+state    real  PRMAX5           ij      misc        1         -      rh7      "PRMAX5"                "MAXIMUM 5 MIN. PRECIPITATION RATE"                                        "kg m-2 s-1"
+state    real  TPRMAX5          ij      misc        1         -      rh7      "TPRMAX5"               "TIME OF MAXIMUM 5 MIN. PRECIPITATION RATE"                                "minute"
+state    real  UV10MAX5         ij      misc        1         -      rh7      "UV10MAX5"                "MAXIMUM 5 MIN. WIND SPEED"                                        "m s-1"
+state    real  TUV10MAX5        ij      misc        1         -      rh7      "TUV10MAX5"               "TIME OF MAXIMUM 5 MIN. WIND SPEED"                                "minute"
+state    real  PRMAX10          ij      misc        1         -      rh7      "PRMAX10"                "MAXIMUM 10 MIN. PRECIPITATION RATE"                                        "kg m-2 s-1"
+state    real  TPRMAX10         ij      misc        1         -      rh7      "TPRMAX10"               "TIME OF MAXIMUM 10 MIN. PRECIPITATION RATE"                                "minute"
+state    real  UV10MAX10        ij      misc        1         -      rh7      "UV10MAX10"                "MAXIMUM 10 MIN. WIND SPEED"                                        "m s-1"
+state    real  TUV10MAX10       ij      misc        1         -      rh7      "TUV10MAX10"               "TIME OF MAXIMUM 10 MIN. WIND SPEED"                                "minute"
+state    real  PRMAX20          ij      misc        1         -      rh7      "PRMAX20"                "MAXIMUM 20 MIN. PRECIPITATION RATE"                                        "kg m-2 s-1"
+state    real  TPRMAX20         ij      misc        1         -      rh7      "TPRMAX20"               "TIME OF MAXIMUM 20 MIN. PRECIPITATION RATE"                                "minute"
+state    real  UV10MAX20        ij      misc        1         -      rh7      "UV10MAX20"                "MAXIMUM 20 MIN. WIND SPEED"                                        "m s-1"
+state    real  TUV10MAX20       ij      misc        1         -      rh7      "TUV10MAX20"               "TIME OF MAXIMUM 20 MIN. WIND SPEED"                                "minute"
+state    real  PRMAX30          ij      misc        1         -      rh7      "PRMAX30"                "MAXIMUM 30 MIN. PRECIPITATION RATE"                                        "kg m-2 s-1"
+state    real  TPRMAX30         ij      misc        1         -      rh7      "TPRMAX30"               "TIME OF MAXIMUM 30 MIN. PRECIPITATION RATE"                                "minute"
+state    real  UV10MAX30        ij      misc        1         -      rh7      "UV10MAX30"                "MAXIMUM 30 MIN. WIND SPEED"                                        "m s-1"
+state    real  TUV10MAX30       ij      misc        1         -      rh7      "TUV10MAX30"               "TIME OF MAXIMUM 30 MIN. WIND SPEED"                                "minute"
+state    real  PRMAX60          ij      misc        1         -      rh7      "PRMAX60"                "MAXIMUM 1H PRECIPITATION RATE"                                        "kg m-2 s-1"
+state    real  TPRMAX60         ij      misc        1         -      rh7      "TPRMAX60"               "TIME OF MAXIMUM 1H PRECIPITATION RATE"                                "minute"
+state    real  UV10MAX60        ij      misc        1         -      rh7      "UV10MAX60"                "MAXIMUM 1H WIND SPEED"                                        "m s-1"
+state    real  TUV10MAX60       ij      misc        1         -      rh7      "TUV10MAX60"               "TIME OF MAXIMUM 1H WIND SPEED"                                "minute"
+
+# Diagnostics from climate simulations. (ccc)
+package   rain_5m     max_rain_5m==1                       -            state:track_dt,track_rain,prmax5,tprmax5
+package   rain_10m    max_rain_10m==1                      -            state:track_dt,track_rain,prmax10,tprmax10
+package   rain_20m    max_rain_20m==1                      -            state:track_dt,track_rain,prmax20,tprmax20
+package   rain_30m    max_rain_30m==1                      -            state:track_dt,track_rain,prmax30,tprmax30
+package   rain_60M    max_rain_60m==1                      -            state:track_dt,track_rain,prmax60,tprmax60
+package   wind_5m     max_wind_5m==1                       -            state:track_dt,track_wind,uv10max5,tuv10max5
+package   wind_10m    max_wind_10m==1                      -            state:track_dt,track_wind,uv10max10,tuv10max10
+package   wind_20m    max_wind_20m==1                      -            state:track_dt,track_wind,uv10max20,tuv10max20
+package   wind_30m    max_wind_30m==1                      -            state:track_dt,track_wind,uv10max30,tuv10max30
+package   wind_60m    max_wind_60m==1                      -            state:track_dt,track_wind,uv10max60,tuv10max60
