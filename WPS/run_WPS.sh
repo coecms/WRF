@@ -33,9 +33,9 @@ source ${WRF_ROOT}/build.env
 
 geogrid.exe
 
-link_grib.csh /g/data/sx70/data/JAN00_v4/fnl_2000012
+link_grib.csh /g/data/sx70/data/SingleDomain_data/matthews/fnl
 # Link Vtable
-ln -sf ${WRF_ROOT}/WPS/ungrib/Variable_Tables/Vtable.GFS.tutorial Vtable
+ln -sf ${WRF_ROOT}/WPS/ungrib/Variable_Tables/Vtable.GFS Vtable
 
 ungrib.exe
 
