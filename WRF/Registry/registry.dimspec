@@ -31,6 +31,9 @@ dimspec    [       -     namelist=obs_prt_max              c     obs_prt_max
 dimspec    obsstid -     constant=40                       c     obs station id names
 dimspec    &       2     namelist=lagday                   z     lagday
 dimspec    seed    1     namelist=seed_dim                 z     seed_dim
+# ccc Add dimensions for window averaging.
+dimspec    ndt     4     namelist=max_window               2     Window max size
+# ccc
 endif
 
 

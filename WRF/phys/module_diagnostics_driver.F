@@ -78,7 +78,7 @@ CONTAINS
       USE module_lightning_driver, ONLY : lightning_driver      
       USE module_diag_misc, ONLY : diagnostic_output_calc
       USE module_diag_nwp, ONLY : diagnostic_output_nwp
-      USE module_diag_cl, ONLY : clwrf_output_calc
+      USE module_diag_cl, ONLY : clwrf_output_calc, diagnostic_clwrf_clim_new
       USE module_diag_pld, ONLY : pld
       USE module_diag_zld, ONLY : zld
       USE module_diag_afwa, ONLY : afwa_diagnostics_driver
@@ -776,6 +776,57 @@ CONTAINS
                     ,KTS=k_start, KTE=k_end                                &
                     ,NUM_TILES=grid%num_tiles                              &
                                                                    )
+         MAX_RATE: IF ( ( config_flags%auxhist7_interval > 0 ) ) THEN
+
+            CALL wrf_debug ( 100 , '--> CALL DIAGNOSTICS PACKAGE: MAX RATE DIAGNOSTICS' )
+
+            CALL diagnostic_clwrf_clim_new(                                   &
+                     RAINCV=grid%raincv    ,RAINNCV=grid%rainncv           &
+                     ,U10=grid%u10, V10=grid%v10                            &
+                     ,SWDOWN=grid%swdown                                    &
+                     ,HISTOUT=config_flags%auxhist7_interval                &
+                     ,HISTSTART_h=config_flags%auxhist7_begin_h             &
+                     ,HISTSTART_m=config_flags%auxhist7_begin_m             &
+                     ,HISTSTART_s=config_flags%auxhist7_begin_s             &
+                     ,HISTSTART=config_flags%auxhist7_begin                 &
+                     ,DO_RAIN5=config_flags%max_rain_5m                     &
+                     ,PRMAX5=grid%prmax5, TPRMAX5=grid%tprmax5              &
+                     ,DO_RAIN10=config_flags%max_rain_10m                   &
+                     ,PRMAX10=grid%prmax10, TPRMAX10=grid%tprmax10          &
+                     ,DO_RAIN20=config_flags%max_rain_20m                   &
+                     ,PRMAX20=grid%prmax20, TPRMAX20=grid%tprmax20          &
+                     ,DO_RAIN30=config_flags%max_rain_30m                   &
+                     ,PRMAX30=grid%prmax30, TPRMAX30=grid%tprmax30          &
+                     ,DO_RAIN60=config_flags%max_rain_60m                   &
+                     ,PRMAX60=grid%prmax60, TPRMAX60=grid%tprmax60          &
+                     ,DO_WIND5=config_flags%max_wind_5m                     &
+                     ,UV10MAX5=grid%uv10max5, TUV10MAX5=grid%tuv10max5      &
+                     ,DO_WIND10=config_flags%max_wind_10m                   &
+                     ,UV10MAX10=grid%uv10max10, TUV10MAX10=grid%tuv10max10  &
+                     ,DO_WIND20=config_flags%max_wind_20m                   &
+                     ,UV10MAX20=grid%uv10max20, TUV10MAX20=grid%tuv10max20  &
+                     ,DO_WIND30=config_flags%max_wind_30m                   &
+                     ,UV10MAX30=grid%uv10max30, TUV10MAX30=grid%tuv10max30  &
+                     ,DO_WIND60=config_flags%max_wind_60m                   &
+                     ,UV10MAX60=grid%uv10max60, TUV10MAX60=grid%tuv10max60  &
+                     ,TRACK_RAIN=grid%track_rain                            &
+                     ,TRACK_WIND=grid%track_wind                            &
+                     ,TRACK_DT=grid%track_dt                                &
+                     ,DSUNSHINE=grid%sunshine                               &
+                     ,INITIME_SUNSHINE=grid%tsunshine                       &
+                     ,is_restart=config_flags%restart                       &
+                     ,DT=grid%dt                                            &
+                     ,XTIME=grid%xtime                                      &
+                     ! Dimension arguments
+                     ,IDS=ids,IDE=ide, JDS=jds,JDE=jde, KDS=kds,KDE=kde     &
+                     ,IMS=ims,IME=ime, JMS=jms,JME=jme, KMS=kms,KME=kme     &
+                     ,IPS=ips,IPE=ipe, JPS=jps,JPE=jpe, KPS=kps,KPE=kpe     &
+                     ,I_START=grid%i_start,I_END=min(grid%i_end, ide-1)     &
+                     ,J_START=grid%j_start,J_END=min(grid%j_end, jde-1)     &
+                     ,KTS=k_start, KTE=min(k_end,kde-1)                     &
+                     ,NUM_TILES=grid%num_tiles,MAX_WINDOW=grid%max_window   &
+                                                                  )
+         END IF MAX_RATE
       END IF CLIMATE_DIAGS
 
 
