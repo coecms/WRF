@@ -3,9 +3,9 @@
 OBJSL   = wrf_io.o field_routines.o module_wrfsi_static.o
 OBJS    = $(OBJSL)
 CODE    = ext_ncdpar_get_dom_ti.code ext_ncdpar_get_var_td.code ext_ncdpar_get_var_ti.code ext_ncdpar_put_dom_ti.code ext_ncdpar_put_var_td.code ext_ncdpar_put_var_ti.code transpose.code 
-FFLAGS  =  $(FCFLAGS) -I$(NETCDFPARPATH)/include -I../ioapi_share
-LIBS    = $(LIB_LOCAL) -L$(NETCDFPARPATH)/lib -lnetcdff -lnetcdf -lhdf5_hl -lhdf5 -lm -lz -lcurl
-LIBFFS  = $(LIB_LOCAL) -L$(NETCDFPARPATH)/lib -lnetcdff -lnetcdf $(NETCDF4_DEP_LIB)
+FFLAGS  =  $(FCFLAGS) -I$(NETCDFPARPATH)/include/Intel -I../ioapi_share
+LIBS    = $(LIB_LOCAL) -L$(NETCDFPARPATH)/lib/Intel -lnetcdff -lnetcdf -lhdf5_hl -lhdf5 -lm -lz -lcurl
+LIBFFS  = $(LIB_LOCAL) -L$(NETCDFPARPATH)/lib/Intel -lnetcdff -lnetcdf $(NETCDF4_DEP_LIB)
 CPP1    = $(CPP) -P $(TRADFLAG)  -D_NETCDFPAR -D_NETCDF4
 M4      = m4 -Uinclude -Uindex -Ulen
 AR      = ar
@@ -24,7 +24,7 @@ libwrfio_nfpar.a:         $(OBJS) $(CODE)
 			$(RANLIB) $@
 
 wrf_io.o:               wrf_io.F90 $(CODE)
-			grep nf_format_64bit $(NETCDFPARPATH)/include/netcdf.inc ;\
+			grep nf_format_64bit $(NETCDFPARPATH)/include/Intel/netcdf.inc ;\
                         a=$$? ; export a ; \
 			if [ $$a -a "$$WRFIO_NCD_LARGE_FILE_SUPPORT" = "1" ] ; then \
                           $(CPP1) -DWRFIO_NCD_LARGE_FILE_SUPPORT -I../ioapi_share wrf_io.F90 | $(M4) - > wrf_io.f ; \
@@ -43,14 +43,14 @@ diffwrf:                diffwrf.F90
 	x=`echo "$(FC)" | awk '{print $$1}'` ; export x ; \
 	if [ $$x = "gfortran" ] ; then \
            echo removing external declaration of iargc for gfortran ; \
-	   $(CPP1) -I$(NETCDFPARPATH)/include -I../ioapi_share diffwrf.F90 | sed '/integer *, *external.*iargc/d' > diffwrf.f ;\
+	   $(CPP1) -I$(NETCDFPARPATH)/include/Intel -I../ioapi_share diffwrf.F90 | sed '/integer *, *external.*iargc/d' > diffwrf.f ;\
         else \
-	   $(CPP1) -I$(NETCDFPARPATH)/include -I../ioapi_share diffwrf.F90 > diffwrf.f ; \
+	   $(CPP1) -I$(NETCDFPARPATH)/include/Intel -I../ioapi_share diffwrf.F90 > diffwrf.f ; \
         fi
 	$(FC) -c $(FFLAGS) diffwrf.f
 	@if [ \( -f ../../frame/wrf_debug.o \) -a \( -f ../../frame/module_wrf_error.o \) -a \( -f $(ESMF_MOD_DEPENDENCE) \) -a \( -f ../../frame/clog.o \) ] ; then \
 	  echo "diffwrf io_netcdfpar is being built now. " ; \
-          if [ \( -f $(NETCDFPARPATH)/lib/libnetcdff.a -o -f $(NETCDFPARPATH)/lib/libnetcdff.so \) ] ; then \
+          if [ \( -f $(NETCDFPARPATH)/lib/Intel/libnetcdff.a -o -f $(NETCDFPARPATH)/lib/Intel/libnetcdff.so \) ] ; then \
             $(FC) $(FFLAGS) $(LDFLAGS) -o diffwrf diffwrf.o $(OBJSL) ../../frame/wrf_debug.o ../../frame/module_wrf_error.o ../../frame/clog.o $(ESMF_IO_LIB_EXT) $(LIBFFS) ;\
           else \
             $(FC) $(FFLAGS) $(LDFLAGS) -o diffwrf diffwrf.o $(OBJSL) ../../frame/wrf_debug.o ../../frame/module_wrf_error.o ../../frame/clog.o $(ESMF_IO_LIB_EXT) $(LIBS) ;\
