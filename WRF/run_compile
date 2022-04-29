@@ -154,7 +154,7 @@ EOF_configure
 
 # Select queue depending on architecture option
 QUEUE=express
-NPROC=8
+NPROC=4
 
 # Find current directory project and path
 fs=`pwd -P`
@@ -174,7 +174,7 @@ fi
 echo Submitting the compilation to the express queue. Allow for about 40min to finish. Use the qstat command to check status.
 qsub $test -N compile_job <<EOF_compile
 #!/bin/bash
-#PBS -l walltime=1:30:00
+#PBS -l walltime=3:30:00
 #PBS -l mem=5GB
 #PBS -l ncpus=$NPROC
 #PBS -j oe
