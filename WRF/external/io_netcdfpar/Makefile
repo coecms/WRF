@@ -39,7 +39,7 @@ module_wrfsi_static.o:  module_wrfsi_static.F90
 			$(FC) -o $@ $(FFLAGS) -c module_wrfsi_static.f
 
 # gfortran treats iargc as intrinsic, so get rid of external declaration in that case
-diffwrf:                diffwrf.F90  wrf_io.o
+diffwrf:                diffwrf.F90  $(OBJSL)
 	x=`echo "$(FC)" | awk '{print $$1}'` ; export x ; \
 	if [ $$x = "gfortran" ] ; then \
            echo removing external declaration of iargc for gfortran ; \
