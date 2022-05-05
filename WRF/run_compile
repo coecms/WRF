@@ -175,7 +175,7 @@ echo Submitting the compilation to the express queue. Allow for about 40min to f
 qsub $test -N compile_job <<EOF_compile
 #!/bin/bash
 #PBS -l walltime=3:30:00
-#PBS -l mem=5GB
+#PBS -l mem=16GB
 #PBS -l ncpus=$NPROC
 #PBS -j oe
 #PBS -q $QUEUE
