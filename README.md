@@ -7,7 +7,18 @@ You can install WRF on any filesystem on Gadi: /home, /g/data or /scratch.
 Keep in mind /scratch is purged regularly. It isn't a problem if you are using
 WRF without modifications (easy to reinstall from here) but you would need to 
 save any code modifications on a different filesystem (or Github etc.)
-To use on Gadi, run:
+To use on Gadi:
+* from version 4.4 onwards, run:
+```
+     git clone -b <VERSION> --recursive https://github.com/coecms/WRF.git
+```
+or
+```
+    git clone -b <VERSION> --recursive git@github.com:coecms/WRF.git      
+```
+where version is the WRF version you want to use.
+
+* before version 4.4, run:
 ```
      git clone -b <VERSION> https://github.com/coecms/WRF.git
 ```
@@ -15,10 +26,11 @@ or
 ```
     git clone -b <VERSION> git@github.com:coecms/WRF.git      
 ```
-where version is the WRF version you want to use.
+where version is the WRF version you want to use.  
 
 Versions currently available:
 =============================
+* V4.4  (with updated WPS)
 * V4.3  (with updated WPS)
 * V4.2.2
 * V4.2.1
@@ -35,9 +47,9 @@ Versions currently available:
 
 Building WRF (ARW)
 ==================
-Go to the WRFV3/ subdirectory, run:
+Go to the WRF/ subdirectory, run:
 ```
-cd WRF/WRFV3/
+cd WRF/WRF/
 ```
 There is a *run_compile* script to help you configure and compile WRF. This script by default will compile the WRFV3 software for a real experiment, with some speed optimisations for the normal, express. normalbw and expressbw queues and with basic nesting. There is a range of command-line arguments accepted by the script. These are:
 * the command-line arguments accepted by the *configure* script
@@ -50,7 +62,7 @@ You can access a full list and description by running:
 ```
 ./run_compile -h
 ```
-To configure and compile WRFV3 with the default options, you simply run:
+To configure and compile WRF with the default options, you simply run:
 ```
 ./run_compile
 ```
@@ -60,7 +72,7 @@ The configure step will run interactively with the output on your screen, then t
 
 After a successful build, one should see the following executable files for WRF (the ARW core):
 ```
-[abc123@gadi WRFV3]$ ls -l main/*.exe
+[abc123@gadi WRF]$ ls -l main/*.exe
 
 -rwx------ 1 abc123 wrf 35559897 Aug 22 17:14 main/ndown.exe
 -rwx------ 1 abc123 wrf 35471615 Aug 22 17:14 main/real.exe
@@ -128,10 +140,6 @@ Note that there are some warnings in the build output like "warning: overriding 
 The October 2016 tutorial case
 ===================================
 The data for the October 2016 WRF tutorial case  can now be found under /g/data/sx70/data/SingleDomain_data/matthew.
-
-The January 2000 tutorial case
-===================================
-For **WRF v4.1 and newer versions**, you will need to use the WPS/ungrib/Variable_Tables/Vtable.GFS.tutorial and **not** WPS/ungrib/Variable_Tables/Vtable.GFS for ungrib.exe. This is because the GFS files have changed in newer versions of GFS and the Vtable.GFS file is suitable for newer versions of GFS, not the ones from 2000. Please see notes in the Vtable file for more information.
 
 Tests run
 =========

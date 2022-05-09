@@ -2,13 +2,21 @@
 
 #
 # Check for command-line arguments
-# At present, the only supported argument is --nowrf, which disables checks to
-# find the path to the compiled WRF model.
+# At present, the only supported arguments are:
+#     --nowrf : disables checks to find the path to the compiled WRF model
+#     --build-grib2-libs : compiles zlib, libpng, and JasPer libraries from
+#                          source in the external/ directory and installs
+#                          the libraries in grib2/
 #
 nowrf=0
+build_grib2=0
 for arg in $@; do
   if [ "${arg}" = "--nowrf" ]; then
     nowrf=1
+  elif [ "${arg}" = "--build-grib2-libs" ]; then
+    build_grib2=1
+  else
+    printf "Unrecognized option %s\n" ${arg}
   fi
 done
 
@@ -216,8 +224,22 @@ the WRF I/O libraries:
 EOF
 fi
 
+grib2dir=""
+if [ ${build_grib2} -eq 1 ]; then
+   grib2dir="${PWD}/grib2"
+
+   cat << EOF
+********************************************************************************
+The zlib, libpng, and JasPer libraries will be compiled from source and
+installed in ${grib2dir} .
+
+The environment variables JASPERLIB and JASPERINC will be ignored.
+********************************************************************************
+EOF
+fi
+
 # Found perl, so proceed with configuration
-perl arch/Config.pl -perl=$PERL -netcdf=$NETCDF -netcdff=$NETCDFF -os=$os -mach=$mach -wrfdir=$wrf_dir
+perl arch/Config.pl -perl=$PERL -netcdf=$NETCDF -netcdff=$NETCDFF -os=$os -mach=$mach -wrfdir=$wrf_dir -grib2dir=$grib2dir
 
 
 #Checking cross-compiling capability for some particular environment 
@@ -458,3 +480,40 @@ EOF
 
   fi
 fi
+
+
+#
+# Check for newer GNU Fortran compilers that require the use of the following:
+# -fallow-argument-mismatch
+#
+cat > gnu_flag_test.F90 << EOF
+program gnu_flag_test
+#ifdef __GNUC__
+#if __GNUC__ > 9
+call exit(1)   ! A GNU extension, but at this point we know this is a GNU compiler
+#endif
+#endif
+end program gnu_flag_test
+EOF
+
+# The above test program gives exit status 1 iff we are using the GNU Fortran
+# compiler with a major version greater than 9
+
+FC=`grep ^SFC configure.wps | cut -d"=" -f2-`
+FFLAGS=`grep ^FFLAGS configure.wps | cut -d"=" -f2-`
+$FC ${FFLAGS} gnu_flag_test.F90 -o gnu_flag_test > /dev/null 2>&1
+if [ -f ./gnu_flag_test ]; then
+   ./gnu_flag_test > /dev/null 2>&1
+   if [ $? -eq 1 ]; then
+      compat="-fallow-argument-mismatch"
+   fi
+   rm gnu_flag_test
+else
+   printf "*** Failed to compile the gnu_flag_test program!\n"
+   printf "    This may be because the selected build option does not work correctly.\n"
+fi
+rm gnu_flag_test.F90
+
+sed "s/CONFIGURE_COMPAT_FLAGS/${compat}/" configure.wps > configure.wps.tmp
+mv configure.wps.tmp configure.wps
+
