@@ -30,6 +30,7 @@ where version is the WRF version you want to use.
 
 Versions currently available:
 =============================
+* V4.4.3 
 * V4.4.2 
 * V4.4.1 
 * V4.4  (with updated WPS)
